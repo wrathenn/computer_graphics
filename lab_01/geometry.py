@@ -38,6 +38,10 @@ class Rectangle(GeometryObject):
         distList: List[float] = list(map(dotDistance, dotList, [*dotList[1::], dotList[0]]))
         if distList[0] != distList[2] or distList[1] != distList[3]:
             return False
+        # Проверка - ни один отрезок не длжен быть = 0
+        for len in distList:
+            if len == 0:
+                return False
 
         # Проверка - угол 90 градусов
         hypotenuse: float = dotDistance(dotList[0], dotList[2])
@@ -54,10 +58,10 @@ class Rectangle(GeometryObject):
             raise Exception("Некорректные точки")
 
 
-a = Dot(1, 5)
-b = Dot(6, 5)
-c = Dot(6, 3)
-d = Dot(1, 4)
+a = Dot(1, 1)
+b = Dot(1, 1)
+c = Dot(1, 1)
+d = Dot(1, 1)
 
 test: Rectangle
 
