@@ -12,17 +12,41 @@ class Store:
             raise Exception("Некорректный индекс при удалении")
         return self.data.pop(id)
 
+    def getDataList(self):
+        return
+
 
 class RectangleStore(Store):
     def add(self, new: Rectangle):
         self.data.append(new)
+
+    def getDataList(self):
+        result = []
+        for i in self.data:
+            i: Rectangle
+            temp = []
+
+            for k in i.cords:
+                k: Dot
+                temp.append(k.x)
+                temp.append(k.y)
+
+            result.append(temp)
+        return result
 
 
 class DotStore(Store):
     def add(self, new: Dot):
         self.data.append(new)
 
+    def getDataList(self):
+        result = []
+        for i in self.data:
+            i: Dot
+            result.append([i.x, i.y])
+
+        return result
+
 
 rectangleStore = RectangleStore()
-dotM1Store = DotStore()
 dotM2Store = DotStore()

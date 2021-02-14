@@ -3,6 +3,8 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as tkmsg
 from typing import Tuple, List
 
+from store import Store
+
 
 class Table:
     def __init__(self, parent: tk.Frame,
@@ -16,9 +18,8 @@ class Table:
             self.table.heading(head, text=head, anchor=tk.CENTER)
             self.table.column(head, anchor=tk.CENTER, width=0)
 
-        for row, i in zip(rows, range(len(rows))):  # Вставить строки
-            self.table.insert('', tk.END,
-                         values=(i, *row) if (len(headings) - len(rows[i]) == 1) else row)
+        for row in rows:  # Вставить строки
+            self.table.insert('', tk.END, values=row)
 
         # Добавить скролл
         scrolltable = tk.Scrollbar(master=parent, command=self.table.yview)
@@ -28,23 +29,18 @@ class Table:
         self.table.pack(expand=tk.YES, fill=tk.BOTH)
 
     def delRow(self):
-        id: int = self.table.focus()
+        id = self.table.focus()
         if id:
             self.table.delete(id)
         else:
             tkmsg.showwarning("Ошибка!", "Перед удалением выберите нужную точку!")
 
+    def delAll(self):
+        for i in self.table.get_children():
+            self.table.delete(i)
 
-
-root = tk.Tk()
-root.geometry('1920x1080')
-
-testFrame = tk.Frame(root, bg="#2b2b2b", bd=5)
-testFrame.place(relx=0.0, rely=0.0, relwidth=0.25, relheight=1, anchor="nw")
-
-tablea = Table(testFrame, headings=('№', 'x', 'y'), rows=[(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13),(31, 13), (31, 13), (31, 13), (31, 13), (31, 13), (31, 13)])
-
-but = tk.Button(root, command=lambda: tablea.delRow())
-but.place(relx=0.01, rely=0.46, relwidth=0.99, relheight=0.42, anchor="nw")
-
-root.mainloop()
+    def render(self, store: Store):
+        self.delAll()
+        a = store.getDataList()
+        for row in store.getDataList():  # Вставить строки
+            self.table.insert('', tk.END, values=row)
