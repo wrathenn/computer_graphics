@@ -26,26 +26,26 @@ root = tk.Tk()
 root.geometry('1920x1080')
 
 # Создать фреймы
-M1Frame = tk.Frame(root, bg="#2b2b2b")
-M1Frame.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
+# M1Frame = tk.Frame(root, bg="#2b2b2b")
+# M1Frame.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 M2Frame = tk.Frame(root, bg="#2b2b2b")
 M2Frame.place(relx=0.8, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 
 mainFrame = tk.Frame(root, bg="#acacac")
-mainFrame.place(relx=0.2, rely=0.0, relwidth=0.6, relheight=0.5, anchor="nw")
+mainFrame.place(relx=0.0, rely=0.0, relwidth=0.8, relheight=0.5, anchor="nw")
 
 inputFrame = tk.Frame(root, bg="orange")
 rectangleFrame = tk.Frame(inputFrame, bg="red")
 dotFrame = tk.Frame(inputFrame, bg="red")
 solveFrame = tk.Frame(inputFrame, bg="yellow")
-inputFrame.place(relx=0.2, rely=0.5, relwidth=0.6, relheight=0.5, anchor="nw")
+inputFrame.place(relx=0.0, rely=0.5, relwidth=0.8, relheight=0.5, anchor="nw")
 rectangleFrame.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 dotFrame.place(relx=0.8, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 solveFrame.place(relx=0.2, rely=0.0, relwidth=0.6, relheight=1, anchor="nw")
 
 graph = Graph(mainFrame)
 
-M1Table = Table(M1Frame, ("x1", "y1", "x2", "y2", "x3", "y3", "x4", "y4"), [])
+# M1Table = Table(M1Frame, ("x1", "y1", "x2", "y2", "x3", "y3", "x4", "y4"), [])
 M2Table = Table(M2Frame, ("x", "y"), [])
 
 rectangleLabel = tk.Label(rectangleFrame, text="Прямоугольник")
@@ -132,14 +132,32 @@ dotXInput.place(relx=0.0, rely=0.25, relwidth=0.5, relheight=0.125)
 dotYInput = tk.Entry(dotFrame, justify="center")
 dotYInput.place(relx=0.5, rely=0.25, relwidth=0.5, relheight=0.125)
 
+def dotGet():
+    try:
+        dot = Dot(int(dotXInput.get()), int(dotYInput.get()))
+    except Exception:
+        tkmsg.showwarning("Ошибка!", "Некорректная первая точка")
+        return 
+
+    dotM2Store.add(dot)
+    M2Table.render(dotM2Store)
+
+def dotDelete():
+    id = M2Table.table.focus()
+    print(id)
+    data = M2Table.table.item(id)["values"]
+    dotM2Store.delete(data)
+    M2Table.render(dotM2)
+    
+
 dotCreateButton = tk.Button(dotFrame, justify="center", bg="green", text="Построить",
-                            command=lambda: print("Заглушка на построение точки"))
+                            command=lambda: dotGet())
 dotCreateButton.place(relx=0.0, rely=0.375, relwidth=0.5, relheight=0.125)
 dotDeleteButton = tk.Button(dotFrame, justify="center", bg="red", text="Удалить",
-                            command=lambda: print("Заглушка на удаление точки"))
+                            command=lambda: dotDelete())
 dotDeleteButton.place(relx=0.5, rely=0.375, relwidth=0.5, relheight=0.125)
 dotDeleteAllButton = tk.Button(dotFrame, justify="center", bg="darkred", text="УДАЛИТЬ ВСЕ",
-                               command=lambda: print("Заглушка на удаление ВСЕХ точек"))
+                            command=lambda: print("Заглушка на удаление ВСЕХ точек"))
 dotDeleteAllButton.place(relx=0.0, rely=0.5, relwidth=1, relheight=0.125)
 
 editLabel = tk.Label(dotFrame, justify="center", text="Правка")
