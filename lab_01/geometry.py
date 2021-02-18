@@ -5,11 +5,11 @@ FLOAT_ERROR_RATE: float = 1e-6
 
 
 class Dot:
-    def __init__(self, x: int = 0, y: int = 0):
-        self.x: int = x
-        self.y: int = y
+    def __init__(self, x: float = 0, y: float = 0):
+        self.x: float = x
+        self.y: float = y
 
-    def setCords(self, x: int, y: int):
+    def setCords(self, x: float, y: float):
         self.x = x
         self.y = y
 

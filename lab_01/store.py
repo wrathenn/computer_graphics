@@ -19,8 +19,6 @@ class Store:
 class RectangleStore(Store):
     def __init__(self, data=None):
         super().__init__(data)
-    # def add(self, new: Rectangle):
-    #     self.data.append(new)
 
     def change(self, rectangle: Rectangle) -> None:
         self.data = [rectangle]
@@ -39,13 +37,27 @@ class RectangleStore(Store):
             result.append(temp)
         return result
 
+    def clear(self):
+        self.data = []
+
 
 class DotStore(Store):
     def __init__(self, data=None):
         super().__init__(data)
 
     def add(self, new: Dot):
+        for i in self.data:
+            i: Dot
+            if i.x == new.x and i.y == new.y:
+                raise Exception("Такая точка уже есть")
         self.data.append(new)
+
+    def find(self, data: List[float]) -> int:
+        for dot, i in zip(self.data, range(len(self.data))):
+            dot: Dot
+            if data == [dot.x, dot.y]:
+                return i
+        return -1
 
     def getDataList(self):
         result = []
@@ -56,11 +68,9 @@ class DotStore(Store):
         return result
 
     def delete(self, data: List[float]):
-        for dot, i in zip(self.data, range(len(self.data))):
-            dot: Dot
-            if data == [dot.x, dot.y]:
-                self.data.pop(i)
-                break
+        id: int = self.find(data)
+        if id != -1:
+            self.data.pop(id)
 
 
 rectangleStore = RectangleStore()
