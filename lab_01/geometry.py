@@ -1,7 +1,14 @@
 from math import sqrt
-from typing import List
+from typing import List, Tuple
 
 FLOAT_ERROR_RATE: float = 1e-6
+
+
+def floatCompare(a: float, b:float):
+    if abs(a - b) < FLOAT_ERROR_RATE:
+        return 1;
+    else:
+        return 0;
 
 
 class Dot:
@@ -13,9 +20,16 @@ class Dot:
         self.x = x
         self.y = y
 
+    def getTupleCords(dot):
+        return dot.x, dot.y
+
 
 def dotDistance(dot1: Dot, dot2: Dot) -> float:
     return sqrt((dot1.x - dot2.x) ** 2 + (dot1.y - dot2.y) ** 2)
+
+# For tuple/list dotTypes
+def dotDistance2(dot1, dot2) -> float:
+    return sqrt((dot1[0] - dot2[0]) ** 2 + (dot1[1] - dot2[1]) ** 2)
 
 
 class GeometryObject:

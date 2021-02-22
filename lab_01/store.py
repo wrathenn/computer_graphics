@@ -9,13 +9,14 @@ class Store:
             data = []
         self.data = data
 
-    def delete(self, data) -> any:
+    def delete(self, index, data) -> any:
         return
 
     def getDataList(self):
         return
 
 
+# List[Rectangle] ~ [Rectangle]
 class RectangleStore(Store):
     def __init__(self, data=None):
         super().__init__(data)
@@ -41,36 +42,37 @@ class RectangleStore(Store):
         self.data = []
 
 
+# Будет такой: [[index=0, dot], [index=1, dot]...]
 class DotStore(Store):
     def __init__(self, data=None):
         super().__init__(data)
 
     def add(self, new: Dot):
-        for i in self.data:
-            i: Dot
-            if i.x == new.x and i.y == new.y:
-                raise Exception("Такая точка уже есть")
-        self.data.append(new)
+        self.data.append([self.getNewIndex(), new])
 
-    def find(self, data: List[float]) -> int:
-        for dot, i in zip(self.data, range(len(self.data))):
-            dot: Dot
-            if data == [dot.x, dot.y]:
-                return i
+    def find(self, index, data: List[float]) -> int:
+        # for dataPart in self.data:
+        #     dot: Dot = dataPart[1:2]
+        #     dotIndex = dataPart[0]
+        #     if data == [dot.x, dot.y] and index == dotIndex:
+        #         return index - 1
         return -1
 
     def getDataList(self):
         result = []
-        for i in self.data:
-            i: Dot
-            result.append([i.x, i.y])
+        for dot, i in zip(self.data, range(len(self.data))):
+            trueDot = dot[1]
+            result.append([i + 1, trueDot.x, trueDot.y])
 
         return result
 
-    def delete(self, data: List[float]):
-        id: int = self.find(data)
-        if id != -1:
-            self.data.pop(id)
+    def delete(self, index, data: List[float]):
+        self.data.pop(index - 1)
+        for dataPart, i in zip(self.data, range(len(self.data))):
+            dataPart[0] = i + 1
+
+    def getNewIndex(self):
+        return len(self.data) + 1
 
 
 rectangleStore = RectangleStore()

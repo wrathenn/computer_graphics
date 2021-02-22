@@ -35,15 +35,21 @@ solveFrame.place(relx=0.2, rely=0.0, relwidth=0.6, relheight=1, anchor="nw")
 
 graph = Graph(mainFrame)
 
+
+def testfu():
+    graph.draw()
+
+
 solveButton = tk.Button(solveFrame, justify="center", bg="green", text="Решить",
-                        command=lambda: graph.draw())
+                        command=lambda: testfu())
 solveButton.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
 solveText = tk.Label(solveFrame, justify="left", state=tk.DISABLED, font="ubuntu 20", fg="black", bg="white",
                      text="Введите координаты вершин прямоугольника!")
 solveText.place(relx=0.0, rely=0.25, relwidth=1, relheight=0.75)
 
-M2Table = Table(M2Frame, ("x", "y"), [])
+M2Table = Table(M2Frame, ("№", "x", "y"), [])
 
+# Кнопки и инпуты прямоугольника
 rectangleLabel = tk.Label(rectangleFrame, text="Прямоугольник")
 rectangleLabel.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.125)
 rectangleXLabel = tk.Label(rectangleFrame, text="x", justify="center")
@@ -117,6 +123,7 @@ rectangleDeleteButton = tk.Button(rectangleFrame, justify="center", bg="red", te
                                   command=lambda: rectangleDelete())
 rectangleDeleteButton.place(relx=0.0, rely=0.875, relwidth=1, relheight=0.125)
 
+# Кнопки и инпуты точки
 dotLabel = tk.Label(dotFrame, text="Точка")
 dotLabel.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.125)
 dotXLabel = tk.Label(dotFrame, text="x", justify="center")
@@ -150,9 +157,11 @@ def dotDelete():
     id = M2Table.table.focus()
     print(id)
     data = M2Table.table.item(id)["values"]
-    data = list(map(float, data))
-    dotM2Store.delete(data)
+    dotData = list(map(float, data[1:2]))
+    dotIndex = int(round(data[0]))
+    dotM2Store.delete(dotIndex, dotData)
     M2Table.render(dotM2Store)
+
 
 def dotDeleteAll():
     dotM2Store.data = []
@@ -162,43 +171,42 @@ def dotDeleteAll():
 def dotChange():
     id = M2Table.table.focus()
     data = M2Table.table.item(id)["values"]
-    data = list(map(float, data))
+    dotData = list(map(float, data[1:2]))
+    dotIndex = int(round(data[0]))
 
-    storeId = dotM2Store.find(data)
-    if storeId != -1:
-        changeWindow: tk.Tk = tk.Tk()
-        changeWindow.geometry("300x300")
-        changeWindow.title("Изменить точку")
+    changeWindow: tk.Tk = tk.Tk()
+    changeWindow.geometry("300x300")
+    changeWindow.title("Изменить точку")
 
-        changeWindowFrame = tk.Frame(changeWindow)
-        changeWindowFrame.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
-        changeLabel = tk.Label(changeWindowFrame, justify="center",
-                               text="Введите новые координаты\n"
-                                    "Предыдущие - " + str(data[0]) + ", " + str(data[1]))
-        changeLabel.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
-        changeXLabel = tk.Label(changeWindowFrame, justify="center", text="X:")
-        changeXLabel.place(relx=0.0, rely=0.25, relwidth=0.3, relheight=0.25)
-        changeXInput = tk.Entry(changeWindowFrame, justify="center")
-        changeXInput.place(relx=0.3, rely=0.25 + 0.0625, relwidth=0.5, relheight=0.125)
-        changeYLabel = tk.Label(changeWindowFrame, justify="center", text="Y:")
-        changeYLabel.place(relx=0.0, rely=0.50, relwidth=0.3, relheight=0.25)
-        changeYInput = tk.Entry(changeWindowFrame, justify="center")
-        changeYInput.place(relx=0.3, rely=0.50 + 0.0625, relwidth=0.5, relheight=0.125)
+    changeWindowFrame = tk.Frame(changeWindow)
+    changeWindowFrame.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
+    changeLabel = tk.Label(changeWindowFrame, justify="center",
+                           text="Введите новые координаты\n"
+                                "Предыдущие - " + str(data[1]) + ", " + str(data[2]))
+    changeLabel.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
+    changeXLabel = tk.Label(changeWindowFrame, justify="center", text="X:")
+    changeXLabel.place(relx=0.0, rely=0.25, relwidth=0.3, relheight=0.25)
+    changeXInput = tk.Entry(changeWindowFrame, justify="center")
+    changeXInput.place(relx=0.3, rely=0.25 + 0.0625, relwidth=0.5, relheight=0.125)
+    changeYLabel = tk.Label(changeWindowFrame, justify="center", text="Y:")
+    changeYLabel.place(relx=0.0, rely=0.50, relwidth=0.3, relheight=0.25)
+    changeYInput = tk.Entry(changeWindowFrame, justify="center")
+    changeYInput.place(relx=0.3, rely=0.50 + 0.0625, relwidth=0.5, relheight=0.125)
 
-        def localChange():
-            try:
-                dot = Dot(float(changeXInput.get()), float(changeYInput.get()))
-            except Exception:
-                tkmsg.showwarning("Ошибка!", "Некорректные данные")
-                return
-            dotM2Store.data[storeId] = dot
-            M2Table.render(dotM2Store)
-            changeWindow.destroy()
+    def localChange():
+        try:
+            dot = Dot(float(changeXInput.get()), float(changeYInput.get()))
+        except Exception:
+            tkmsg.showwarning("Ошибка!", "Некорректные данные")
+            return
+        dotM2Store.data[dotIndex - 1][1] = dot
+        M2Table.render(dotM2Store)
+        changeWindow.destroy()
 
-        changeButton = tk.Button(changeWindowFrame, justify="center", bg="green", text="Изменить",
-                                 command=lambda: localChange())
-        changeButton.place(relx=0.0, rely=0.75, relwidth=1, relheight=0.25)
-        changeWindow.mainloop()
+    changeButton = tk.Button(changeWindowFrame, justify="center", bg="green", text="Изменить",
+                             command=lambda: localChange())
+    changeButton.place(relx=0.0, rely=0.75, relwidth=1, relheight=0.25)
+    changeWindow.mainloop()
 
 
 dotCreateButton = tk.Button(dotFrame, justify="center", bg="green", text="Построить",
