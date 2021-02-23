@@ -20,7 +20,9 @@ class Graph:
                      'rectangleDiagonals': None,
                      'triangleMedians': None,
                      'connector': None,
-                     'extraY': None
+                     'extraY': None,
+                     'axesX': None,
+                     'axesY': None
                      }
         self.figure.gca().set_aspect("equal")
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.parent)
@@ -29,20 +31,34 @@ class Graph:
     def clearData(self):
         if self.data['rectangle']:
             self.data['rectangle'].remove()
+            self.data['rectangle'] = None
         if self.data['triangle']:
             self.data['triangle'].remove()
+            self.data['triangle'] = None
         if self.data['connector']:
             self.data['connector'].remove()
+            self.data['connector'] = None
         if self.data['extraY']:
             self.data['extraY'].remove()
+            self.data['extraY'] = None
+        if self.data['axesX']:
+            self.data['axesX'].remove()
+            self.data['axesX'] = None
+        if self.data['axesY']:
+            self.data['axesY'].remove()
+            self.data['axesY'] = None
         if self.data['rectangleDiagonals']:
             if len(self.data['rectangleDiagonals']):
                 for dataPart in self.data['rectangleDiagonals']:
                     dataPart.remove()
+            self.data['rectangleDiagonals'] = None
         if self.data['triangleMedians']:
             if len(self.data['triangleMedians']):
                 for dataPart in self.data['triangleMedians']:
                     dataPart.remove()
+            self.data['triangleMedians'] = None
+
+        self.canvas.draw()
 
 
     def countAxes(self, triangle):
@@ -72,8 +88,7 @@ class Graph:
 
         self.data['axisX'] = [xMin - localPadding, xMax + localPadding]
         self.data['axisY'] = [yMin - localPadding, yMax + localPadding]
-        print(self.data['axisX'], self.data['axisY'])
-        return 1;
+        return (xMin, xMax), (yMin, yMax);
 
     def draw(self):
         self.clearData()
@@ -95,7 +110,7 @@ class Graph:
         resultConnector = []
         normalTrianglesAmount = 0
         badTrianglesAmount = 0
-        minCos = 10  # Лишь бы больше 1
+        maxCos = 0  # Угол 90 градусов - косинус = 0
         # dotPart = [index, x, y]
         for dotPart1 in allDots:
             for dotPart2 in allDots[dotPart1[0]:]:
@@ -120,15 +135,15 @@ class Graph:
                         dist3 = dotDistance2(triangleCenter, extraDot)
 
                         cos = (dist1 ** 2 + dist2 ** 2 - dist3 ** 2) / dist1 / dist2 / 2
-                        if abs(cos) < minCos:
-                            minCos = abs(cos)
+                        if abs(cos) < maxCos:
+                            maxCos = abs(cos)
                             resultTriangle = [dot1, dot2, dot3]
                             resultCenterDot = triangleCenter
 
-                        resultTriangleMedians = [[dot1, localGetCenter(dot2, dot3)],
-                                                 [dot2, localGetCenter(dot1, dot3)],
-                                                 [dot3, localGetCenter(dot1, dot2)]]
-                        resultConnector = [resultCenterDot, rectangleCenter]
+                            resultTriangleMedians = [[dot1, localGetCenter(dot2, dot3)],
+                                                     [dot2, localGetCenter(dot1, dot3)],
+                                                     [dot3, localGetCenter(dot1, dot2)]]
+                            resultConnector = [resultCenterDot, rectangleCenter]
 
                         normalTrianglesAmount += 1;
 
@@ -136,9 +151,15 @@ class Graph:
             tkmsg.showwarning("Ошибка!", "Все треугольники оказались вырожденными")
             return
 
+        print("Вырожденных треугольников: ", badTrianglesAmount)
+        print("Нормальных треугольников треугольников: ", normalTrianglesAmount)
+        print("Найденный треугольник: ", resultTriangle)
+        print("Центр прямоугольника: ", rectangleCenter)
+        print("Центр тяжести треугольника: ", resultCenterDot)
+        print("Косинус угла: ", maxCos)
+
         # Построить сам прямоугольник
         self.data['rectangle'] = plt.Polygon(rectangleCords, fill=False, ec="blue", lw=3)
-        print(self.data['rectangle'])
         self.figure.gca().add_patch(self.data['rectangle'])
 
         # Добавить диагонали прямоугольника
@@ -172,8 +193,12 @@ class Graph:
         self.figure.gca().add_patch(self.data['extraY'])
 
         # Подвинуть оси
-        self.countAxes(resultTriangle)
+        axesX, axesY = self.countAxes(resultTriangle)
         self.figure.gca().set_xlim(self.data['axisX'])
         self.figure.gca().set_ylim(self.data['axisY'])
+        self.data['axesX'] = plt.Polygon([(axesX[0] - 2, 0), (axesX[1] + 2, 0)], ec="black", lw=1)
+        self.data['axesY'] = plt.Polygon([(0, axesY[0] - 2), (0, axesY[1] + 2)], ec="black", lw=1)
+        self.figure.gca().add_patch(self.data['axesX'])
+        self.figure.gca().add_patch(self.data['axesY'])
 
         self.canvas.draw()
