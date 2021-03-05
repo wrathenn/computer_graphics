@@ -45,12 +45,12 @@ class Rectangle(GeometryObject):
     def check(dotList: List[Dot]):
         # Проверка - попарно равные отрезки
         distList: List[float] = list(map(dotDistance, dotList, [*dotList[1::], dotList[0]]))
-        if distList[0] != distList[2] or distList[1] != distList[3]:
+        if not floatCompare(distList[0], distList[2]) or not floatCompare(distList[1], distList[3]):
             return False
 
         # Проверка - ни один отрезок не должен быть = 0
         for length in distList:
-            if length == 0:
+            if floatCompare(length, 0.0):
                 return False
 
         # Проверка - угол 90 градусов

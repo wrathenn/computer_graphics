@@ -1,4 +1,4 @@
-from math import acos
+from math import acos, pi
 
 import matplotlib.pyplot as plt
 import tkinter as tk
@@ -78,10 +78,10 @@ class Graph:
         self.canvas.draw()
 
     def countAxes(self, triangle):
-        localPadding = 2;
+        localPadding = 2
 
-        if len(rectangleStore.data) == 0 or len(dotM2Store.data) == 0:
-            return 0;
+        if len(rectangleStore.data) == 0:
+            return 0
 
         rectangle: Rectangle = rectangleStore.data[0]
         xMax: float = rectangle.cords[0].x
@@ -106,14 +106,38 @@ class Graph:
         self.data['axisY'] = [yMin - localPadding, yMax + localPadding]
         return (xMin, xMax), (yMin, yMax)
 
-
-    def draw(self):
+    def drawOnlyRectangle(self):
         self.clearData()
+
+        # Координаты прямоугольника в виде [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+        rectangleCords = list(map(Dot.getTupleCords, rectangleStore.data[0].cords))
+
+        # Построить сам прямоугольник
+        self.data['rectangle'] = plt.Polygon(rectangleCords, fill=False, ec="blue", lw=3)
+        self.figure.gca().add_patch(self.data['rectangle'])
+
+        # Подвинуть оси
+        axesX, axesY = self.countAxes([[0, 0], [0, 0], [0, 0]])
+        self.figure.gca().set_xlim(self.data['axisX'])
+        self.figure.gca().set_ylim(self.data['axisY'])
+        self.data['axesX'] = plt.Polygon([(axesX[0] - 2, 0), (axesX[1] + 2, 0)], ec="black", lw=1)
+        self.data['axesY'] = plt.Polygon([(0, axesY[0] - 2), (0, axesY[1] + 2)], ec="black", lw=1)
+        self.figure.gca().add_patch(self.data['axesX'])
+        self.figure.gca().add_patch(self.data['axesY'])
+
+        self.canvas.draw()
+
+    def draw(self) -> str:
+        result: str = ""
 
         allDots = dotM2Store.getDataList()
         if len(allDots) < 3:
             tkmsg.showwarning("Ошибка!", "Слишком мало точек")
-            return
+            return "Ошибка! Слишком мало точек"
+
+        if len(rectangleStore.data) == 0:
+            tkmsg.showwarning("Ошибка!", "Не задан прямоугольник")
+            return "Ошибка! Не задан прямоугольник"
 
         # Координаты прямоугольника в виде [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         rectangleCords = list(map(Dot.getTupleCords, rectangleStore.data[0].cords))
@@ -175,23 +199,24 @@ class Graph:
 
         if normalTrianglesAmount == 0:
             tkmsg.showwarning("Ошибка!", "Все треугольники оказались вырожденными")
-            return
+            return "Ошибка! Все треугольники оказались вырожденными"
 
-        print("Вырожденных треугольников: ", badTrianglesAmount)
-        print("Нормальных треугольников треугольников: ", normalTrianglesAmount)
-        print("Найденный треугольник: ", resultTriangle)
-        print("Центр прямоугольника: ", rectangleCenter)
-        print("Центр тяжести треугольника: {:.3f}, {:.3f}".format(resultCenterDot[0], resultCenterDot[1]))
-        print("Косинус угла: {:.3f}".format(maxCos))
-        print("Угол: {:.3f}".format(acos(maxCos)))
+        result += f"Прямоугольник: {list(map(lambda x: [round(x[0], 3), round(x[1], 3)], rectangleCords))}\n"
+        result += f"Найденный треугольник: {resultTriangle}\n"
+        result += f"Центр прямоугольника: {rectangleCenter[0]:.3f}, {rectangleCenter[1]:.3f}\n"
+        result += f"Центр тяжести треугольника: {resultCenterDot[0]:.3f}, {resultCenterDot[1]:.3f}\n"
+        result += f"Косинус угла: {maxCos:.3f}\n"
+        result += f"Угол: {acos(maxCos) / pi * 180:.3f}\n"
+
+        self.clearData()
 
         # Построить сам прямоугольник
         self.data['rectangle'] = plt.Polygon(rectangleCords, fill=False, ec="blue", lw=3)
         self.figure.gca().add_patch(self.data['rectangle'])
 
         # Добавить диагонали прямоугольника
-        self.data['rectangleDiagonals'] = [plt.Polygon([rectangleCords[0], rectangleCords[2]], ec="blue", lw=3),
-                                           plt.Polygon([rectangleCords[1], rectangleCords[3]], ec="blue", lw=3)]
+        self.data['rectangleDiagonals'] = [plt.Polygon([rectangleCords[0], rectangleCords[2]], ec="blue", lw=1),
+                                           plt.Polygon([rectangleCords[1], rectangleCords[3]], ec="blue", lw=1)]
         self.figure.gca().add_patch(self.data['rectangleDiagonals'][0])
         self.figure.gca().add_patch(self.data['rectangleDiagonals'][1])
 
@@ -200,9 +225,9 @@ class Graph:
         self.figure.gca().add_patch(self.data['triangle'])
 
         # Добавить медианы этого треугольника
-        self.data['triangleMedians'] = [plt.Polygon(resultTriangleMedians[0], ec="red", lw=3),
-                                        plt.Polygon(resultTriangleMedians[1], ec="red", lw=3),
-                                        plt.Polygon(resultTriangleMedians[2], ec="red", lw=3)
+        self.data['triangleMedians'] = [plt.Polygon(resultTriangleMedians[0], ec="red", lw=1),
+                                        plt.Polygon(resultTriangleMedians[1], ec="red", lw=1),
+                                        plt.Polygon(resultTriangleMedians[2], ec="red", lw=1)
                                         ]
         self.figure.gca().add_patch(self.data['triangleMedians'][0])
         self.figure.gca().add_patch(self.data['triangleMedians'][1])
@@ -229,3 +254,5 @@ class Graph:
         self.figure.gca().add_patch(self.data['axesY'])
 
         self.canvas.draw()
+
+        return result

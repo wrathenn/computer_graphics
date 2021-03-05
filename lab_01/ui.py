@@ -1,8 +1,9 @@
 import matplotlib
 import tkinter as tk
 import tkinter.messagebox as tkmsg
+import math
 
-from geometry import Dot, Rectangle
+from geometry import Dot, Rectangle, floatCompare
 
 from graph import Graph
 from table import Table
@@ -36,12 +37,19 @@ solveFrame.place(relx=0.2, rely=0.0, relwidth=0.6, relheight=1, anchor="nw")
 
 graph = Graph(mainFrame)
 
-solveButton = tk.Button(solveFrame, justify="center", bg="green", text="Решить",
-                        command=lambda: graph.draw())
-solveButton.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
-solveText = tk.Label(solveFrame, justify="left", state=tk.DISABLED, font="ubuntu 20", fg="black", bg="white",
-                     text="Введите координаты вершин прямоугольника!")
+solveText = tk.Label(solveFrame, justify=tk.LEFT, state=tk.NORMAL, font="ubuntu 14", fg="black", bg="white",
+                     anchor="nw", text="Введите координаты вершин прямоугольника!")
 solveText.place(relx=0.0, rely=0.25, relwidth=1, relheight=0.75)
+
+
+def findSolution() -> None:
+    new_text = graph.draw()
+    solveText.configure(text=new_text)
+
+
+solveButton = tk.Button(solveFrame, justify="center", bg="green", text="Решить",
+                        command=lambda: findSolution())
+solveButton.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
 
 M2Table = Table(M2Frame, ("№", "x", "y"), [])
 
@@ -53,69 +61,70 @@ rectangleXLabel.place(relx=0.0, rely=0.125, relwidth=0.5, relheight=0.125)
 rectangleYLabel = tk.Label(rectangleFrame, text="y", justify="center")
 rectangleYLabel.place(relx=0.5, rely=0.125, relwidth=0.5, relheight=0.125)
 
-rectangleDot1XInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot1XInput.place(relx=0.0, rely=0.25, relwidth=0.5, relheight=0.125)
-rectangleDot1YInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot1YInput.place(relx=0.5, rely=0.25, relwidth=0.5, relheight=0.125)
-rectangleDot2XInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot2XInput.place(relx=0.0, rely=0.375, relwidth=0.5, relheight=0.125)
-rectangleDot2YInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot2YInput.place(relx=0.5, rely=0.375, relwidth=0.5, relheight=0.125)
-rectangleDot3XInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot3XInput.place(relx=0.0, rely=0.5, relwidth=0.5, relheight=0.125)
-rectangleDot3YInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot3YInput.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.125)
-rectangleDot4XInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot4XInput.place(relx=0.0, rely=0.625, relwidth=0.5, relheight=0.125)
-rectangleDot4YInput = tk.Entry(rectangleFrame, justify="center")
-rectangleDot4YInput.place(relx=0.5, rely=0.625, relwidth=0.5, relheight=0.125)
+rectangleDotXInput = tk.Entry(rectangleFrame, justify="center")
+rectangleDotXInput.place(relx=0.0, rely=0.25, relwidth=0.5, relheight=0.125)
+rectangleDotYInput = tk.Entry(rectangleFrame, justify="center")
+rectangleDotYInput.place(relx=0.5, rely=0.25, relwidth=0.5, relheight=0.125)
+rectangleHeightLabel = tk.Label(rectangleFrame, text="Высота")
+rectangleHeightLabel.place(relx=0.0, rely=0.375, relwidth=0.5, relheight=0.125)
+rectangleHeightInput = tk.Entry(rectangleFrame, justify="center")
+rectangleHeightInput.place(relx=0.5, rely=0.375, relwidth=0.5, relheight=0.125)
+rectangleWidthLabel = tk.Label(rectangleFrame, text="Ширина")
+rectangleWidthLabel.place(relx=0.0, rely=0.5, relwidth=0.5, relheight=0.125)
+rectangleWidthInput = tk.Entry(rectangleFrame, justify="center")
+rectangleWidthInput.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.125)
+rectangleAngleLabel = tk.Label(rectangleFrame, text="Угол наклона")
+rectangleAngleLabel.place(relx=0.0, rely=0.625, relwidth=0.5, relheight=0.125)
+rectangleAngleInput = tk.Entry(rectangleFrame, justify="center")
+rectangleAngleInput.place(relx=0.5, rely=0.625, relwidth=0.5, relheight=0.125)
 
 
 def rectangleGet():
     try:
-        dot1 = Dot(float(rectangleDot1XInput.get()), float(rectangleDot1YInput.get()))
+        dot1 = Dot(float(rectangleDotXInput.get()), float(rectangleDotYInput.get()))
+        h = float(rectangleHeightInput.get())
+        l = float(rectangleWidthInput.get())
+        angle = float(rectangleAngleInput.get())
     except Exception:
-        tkmsg.showwarning("Ошибка!", "Некорректная первая точка")
-        return
-    try:
-        dot2 = Dot(float(rectangleDot2XInput.get()), float(rectangleDot2YInput.get()))
-    except Exception:
-        tkmsg.showwarning("Ошибка!", "Некорректная вторая точка")
-        return
-    try:
-        dot3 = Dot(float(rectangleDot3XInput.get()), float(rectangleDot3YInput.get()))
-    except Exception:
-        tkmsg.showwarning("Ошибка!", "Некорректная третья точка")
-        return
-    try:
-        dot4 = Dot(float(rectangleDot4XInput.get()), float(rectangleDot4YInput.get()))
-    except Exception:
-        tkmsg.showwarning("Ошибка!", "Некорректная четвертая точка")
+        tkmsg.showwarning("Ошибка!", "Некорректные данные")
         return
 
-    try:
-        rectangle = Rectangle(dot1, dot2, dot3, dot4)
-    except Exception:
-        tkmsg.showwarning("Ошибка!", "Введенные точки не образуют прямоугольник")
-        return
+    angle_l = math.pi / 180 * angle
+    # Второй угол - "пи/2 - первый", так что можно заменить его косинус и синус по формулам приведения
+    l_x_cos = l * math.cos(angle_l)
+    l_x_sin = l * math.sin(angle_l)
+    h_x_cos = h * math.sin(angle_l)
+    h_x_sin = h * math.cos(angle_l)
+    l_x_cos = 0 if floatCompare(l_x_cos, 0) else l_x_cos
+    l_x_sin = 0 if floatCompare(l_x_sin, 0) else l_x_sin
+    h_x_cos = 0 if floatCompare(h_x_cos, 0) else h_x_cos
+    h_x_sin = 0 if floatCompare(h_x_sin, 0) else h_x_sin
 
+    dot2 = Dot(dot1.x - h_x_cos, dot1.y + h_x_sin)
+    dot3 = Dot(dot2.x + l_x_cos, dot2.y + l_x_sin)
+    dot4 = Dot(dot1.x + l_x_cos, dot1.y + l_x_sin)
+
+    rectangle = Rectangle(dot1, dot2, dot3, dot4)
     rectangleStore.change(rectangle)
+
+    graph.drawOnlyRectangle()
     solveText.configure(text="Координаты текущего прямоугольника:" +
-                             "\nx1 - " + str(rectangle.cords[0].x) + ", y1 - " + str(rectangle.cords[0].y) +
-                             "\nx2 - " + str(rectangle.cords[1].x) + ", y2 - " + str(rectangle.cords[1].y) +
-                             "\nx3 - " + str(rectangle.cords[2].x) + ", y3 - " + str(rectangle.cords[2].y) +
-                             "\nx4 - " + str(rectangle.cords[1].x) + ", y4 - " + str(rectangle.cords[1].y))
+                             "\nx1 - " + str(round(rectangle.cords[0].x, 3)) + ", y1 - " + str(round(rectangle.cords[0].y, 3)) +
+                             "\nx2 - " + str(round(rectangle.cords[1].x, 3)) + ", y2 - " + str(round(rectangle.cords[1].y, 3)) +
+                             "\nx3 - " + str(round(rectangle.cords[2].x, 3)) + ", y3 - " + str(round(rectangle.cords[2].y, 3)) +
+                             "\nx4 - " + str(round(rectangle.cords[3].x, 3)) + ", y4 - " + str(round(rectangle.cords[3].y, 3)))
 
 
 def rectangleDelete():
     rectangleStore.clear()
+    graph.clearData()
     solveText.configure(text="Введите координаты вершин прямоугольника!")
 
 
 rectangleCreateButton = tk.Button(rectangleFrame, justify="center", bg="green", text="Построить/Изменить",
                                   command=lambda: rectangleGet(), fg="white")
 rectangleCreateButton.place(relx=0.0, rely=0.75, relwidth=1, relheight=0.125)
-rectangleDeleteButton = tk.Button(rectangleFrame, justify="center", bg="red", text="Удалить",
+rectangleDeleteButton = tk.Button(rectangleFrame, justify="center", bg="red", text="Удалить", fg="white",
                                   command=lambda: rectangleDelete())
 rectangleDeleteButton.place(relx=0.0, rely=0.875, relwidth=1, relheight=0.125)
 
@@ -167,6 +176,8 @@ def dotDeleteAll():
 
 def dotChange():
     id = M2Table.table.focus()
+    if id == "":
+        return
     data = M2Table.table.item(id)["values"]
     dotData = list(map(float, data[1:2]))
     dotIndex = int(round(data[0]))
@@ -209,7 +220,7 @@ def dotChange():
 dotCreateButton = tk.Button(dotFrame, justify="center", bg="green", text="Построить",
                             command=lambda: dotGet(), fg="white")
 dotCreateButton.place(relx=0.0, rely=0.375, relwidth=0.5, relheight=0.125)
-dotDeleteButton = tk.Button(dotFrame, justify="center", bg="red", text="Удалить",
+dotDeleteButton = tk.Button(dotFrame, justify="center", bg="red", text="Удалить", fg="white",
                             command=lambda: dotDelete())
 dotDeleteButton.place(relx=0.5, rely=0.375, relwidth=0.5, relheight=0.125)
 dotChangeButton = tk.Button(dotFrame, justify="center", bg="orange", text="изменить",
