@@ -63,19 +63,6 @@ class Rectangle(GeometryObject):
     def __init__(self, *dots):
         if Rectangle.check([*dots]):
             super().__init__([*dots])
-            print("Корректный прямоугольник")
+            # print("Корректный прямоугольник")
         else:
             raise Exception("Некорректные точки")
-
-
-a = Dot(1, 1)
-b = Dot(1, 2)
-c = Dot(2, 2)
-d = Dot(2, 1)
-
-test: Rectangle
-
-try:
-    test = Rectangle(a, b, c, d)
-except Exception:
-    print("Ошибка")

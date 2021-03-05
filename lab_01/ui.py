@@ -13,6 +13,7 @@ matplotlib.use('TkAgg')
 
 # Создать окно
 root = tk.Tk()
+root.title("ЛР №1 Шацкий Р.Е. ИУ7-45Б")
 root.geometry('1920x1080')
 
 # Создать фреймы
@@ -22,26 +23,21 @@ M2Frame = tk.Frame(root, bg="#2b2b2b")
 M2Frame.place(relx=0.8, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 
 mainFrame = tk.Frame(root, bg="#acacac")
-mainFrame.place(relx=0.0, rely=0.0, relwidth=0.8, relheight=0.5, anchor="nw")
+mainFrame.place(relx=0.0, rely=0.0, relwidth=0.8, relheight=0.75, anchor="nw")
 
 inputFrame = tk.Frame(root)
 rectangleFrame = tk.Frame(inputFrame)
 dotFrame = tk.Frame(inputFrame)
 solveFrame = tk.Frame(inputFrame)
-inputFrame.place(relx=0.0, rely=0.5, relwidth=0.8, relheight=0.5, anchor="nw")
+inputFrame.place(relx=0.0, rely=0.75, relwidth=0.8, relheight=0.25, anchor="nw")
 rectangleFrame.place(relx=0.0, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 dotFrame.place(relx=0.8, rely=0.0, relwidth=0.2, relheight=1, anchor="nw")
 solveFrame.place(relx=0.2, rely=0.0, relwidth=0.6, relheight=1, anchor="nw")
 
 graph = Graph(mainFrame)
 
-
-def testfu():
-    graph.draw()
-
-
 solveButton = tk.Button(solveFrame, justify="center", bg="green", text="Решить",
-                        command=lambda: testfu())
+                        command=lambda: graph.draw())
 solveButton.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.25)
 solveText = tk.Label(solveFrame, justify="left", state=tk.DISABLED, font="ubuntu 20", fg="black", bg="white",
                      text="Введите координаты вершин прямоугольника!")
@@ -117,7 +113,7 @@ def rectangleDelete():
 
 
 rectangleCreateButton = tk.Button(rectangleFrame, justify="center", bg="green", text="Построить/Изменить",
-                                  command=lambda: rectangleGet())
+                                  command=lambda: rectangleGet(), fg="white")
 rectangleCreateButton.place(relx=0.0, rely=0.75, relwidth=1, relheight=0.125)
 rectangleDeleteButton = tk.Button(rectangleFrame, justify="center", bg="red", text="Удалить",
                                   command=lambda: rectangleDelete())
@@ -155,7 +151,8 @@ def dotGet():
 
 def dotDelete():
     id = M2Table.table.focus()
-    print(id)
+    if not id:
+        return
     data = M2Table.table.item(id)["values"]
     dotData = list(map(float, data[1:2]))
     dotIndex = int(round(data[0]))
@@ -210,7 +207,7 @@ def dotChange():
 
 
 dotCreateButton = tk.Button(dotFrame, justify="center", bg="green", text="Построить",
-                            command=lambda: dotGet())
+                            command=lambda: dotGet(), fg="white")
 dotCreateButton.place(relx=0.0, rely=0.375, relwidth=0.5, relheight=0.125)
 dotDeleteButton = tk.Button(dotFrame, justify="center", bg="red", text="Удалить",
                             command=lambda: dotDelete())
@@ -219,7 +216,7 @@ dotChangeButton = tk.Button(dotFrame, justify="center", bg="orange", text="из�
                             command=lambda: dotChange())
 dotChangeButton.place(relx=0.0, rely=0.5, relwidth=1, relheight=0.125)
 dotDeleteAllButton = tk.Button(dotFrame, justify="center", bg="darkred", text="УДАЛИТЬ ВСЕ",
-                               command=lambda: dotDeleteAll())
+                               command=lambda: dotDeleteAll(), fg="white")
 dotDeleteAllButton.place(relx=0.0, rely=0.625, relwidth=1, relheight=0.125)
 
 root.mainloop()

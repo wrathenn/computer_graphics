@@ -1,3 +1,5 @@
+from math import acos
+
 import matplotlib.pyplot as plt
 import tkinter as tk
 import tkinter.messagebox as tkmsg
@@ -24,9 +26,24 @@ class Graph:
                      'axesX': None,
                      'axesY': None
                      }
+        axes = self.figure.gca()
         self.figure.gca().set_aspect("equal")
+        axes.plot(1, 0, ">k", transform=axes.get_yaxis_transform(), clip_on=False)
+        axes.plot(0, 1, "^k", transform=axes.get_xaxis_transform(), clip_on=False)
+        axes.set_xlabel("X", loc="right")
+        axes.set_ylabel("Y", loc="top")
+
+        # Move the left and bottom spines to x = 0 and y = 0, respectively.
+        axes.spines["left"].set_position(("data", 0))
+        axes.spines["bottom"].set_position(("data", 0))
+
+        # Hide the top and right spines.
+        axes.spines["top"].set_visible(False)
+        axes.spines["right"].set_visible(False)
+
         self.canvas = FigureCanvasTkAgg(self.figure, master=self.parent)
-        self.canvas.tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        # self.canvas.tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
     def clearData(self):
         if self.data['rectangle']:
@@ -60,7 +77,6 @@ class Graph:
 
         self.canvas.draw()
 
-
     def countAxes(self, triangle):
         localPadding = 2;
 
@@ -88,7 +104,8 @@ class Graph:
 
         self.data['axisX'] = [xMin - localPadding, xMax + localPadding]
         self.data['axisY'] = [yMin - localPadding, yMax + localPadding]
-        return (xMin, xMax), (yMin, yMax);
+        return (xMin, xMax), (yMin, yMax)
+
 
     def draw(self):
         self.clearData()
@@ -100,6 +117,8 @@ class Graph:
 
         # Координаты прямоугольника в виде [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         rectangleCords = list(map(Dot.getTupleCords, rectangleStore.data[0].cords))
+
+        # Нахождение центра прямоугольника
         rectangleCenter = ((rectangleCords[0][0] + rectangleCords[2][0]) / 2,
                            (rectangleCords[0][1] + rectangleCords[2][1]) / 2)
         extraDot = (rectangleCenter[0], rectangleCenter[1] + 2)
@@ -115,7 +134,7 @@ class Graph:
         for dotPart1 in allDots:
             for dotPart2 in allDots[dotPart1[0]:]:
                 for dotPart3 in allDots[dotPart2[0]:]:
-                    print(dotPart1, dotPart2, dotPart3)
+                    # print(dotPart1, dotPart2, dotPart3)
                     dot1 = dotPart1[1::]
                     dot2 = dotPart2[1::]
                     dot3 = dotPart3[1::]
@@ -127,15 +146,22 @@ class Graph:
                     if floatCompare(dist1, dist2 + dist3) or \
                             floatCompare(dist2, dist1 + dist3) or \
                             floatCompare(dist3, dist1 + dist2):
-                        badTrianglesAmount += 1;
+                        badTrianglesAmount += 1
                     else:
+                        # Нахождение центра тяжести треугольника
                         triangleCenter = ((dot1[0] + dot2[0] + dot3[0]) / 3, (dot1[1] + dot2[1] + dot3[1]) / 3)
                         dist1 = dotDistance2(rectangleCenter, triangleCenter)
                         dist2 = dotDistance2(rectangleCenter, extraDot)
                         dist3 = dotDistance2(triangleCenter, extraDot)
 
+                        if floatCompare(dist1, 0) or floatCompare(dist2, 0) or floatCompare(dist3, 0):
+                            badTrianglesAmount += 1
+                            continue
+
+                        # Нахождение косинуса по теореме косинусов
                         cos = (dist1 ** 2 + dist2 ** 2 - dist3 ** 2) / dist1 / dist2 / 2
-                        if abs(cos) < maxCos:
+
+                        if abs(cos) > maxCos:
                             maxCos = abs(cos)
                             resultTriangle = [dot1, dot2, dot3]
                             resultCenterDot = triangleCenter
@@ -145,7 +171,7 @@ class Graph:
                                                      [dot3, localGetCenter(dot1, dot2)]]
                             resultConnector = [resultCenterDot, rectangleCenter]
 
-                        normalTrianglesAmount += 1;
+                        normalTrianglesAmount += 1
 
         if normalTrianglesAmount == 0:
             tkmsg.showwarning("Ошибка!", "Все треугольники оказались вырожденными")
@@ -155,8 +181,9 @@ class Graph:
         print("Нормальных треугольников треугольников: ", normalTrianglesAmount)
         print("Найденный треугольник: ", resultTriangle)
         print("Центр прямоугольника: ", rectangleCenter)
-        print("Центр тяжести треугольника: ", resultCenterDot)
-        print("Косинус угла: ", maxCos)
+        print("Центр тяжести треугольника: {:.3f}, {:.3f}".format(resultCenterDot[0], resultCenterDot[1]))
+        print("Косинус угла: {:.3f}".format(maxCos))
+        print("Угол: {:.3f}".format(acos(maxCos)))
 
         # Построить сам прямоугольник
         self.data['rectangle'] = plt.Polygon(rectangleCords, fill=False, ec="blue", lw=3)
