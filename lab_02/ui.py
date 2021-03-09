@@ -16,7 +16,7 @@ root.geometry('1920x1080')
 mainFrame = tk.Frame(root)
 mainFrame.place(relx=0.0, rely=0.0, relwidth=0.875, relheight=1.0, anchor="nw")
 
-graph = Graph(mainFrame)
+graph = Graph(mainFrame, x_offset=10, y_offset=10)
 
 # Фрейм с полями ввода и кнопками
 
@@ -37,7 +37,7 @@ moveYInput = tk.Entry(inputFrame, justify="center")
 moveYInput.place(relx=0.5, rely=2 / 18, relwidth=0.5, relheight=1 / 18)
 
 moveButton = tk.Button(inputFrame, justify="center", bg="green", text="Переместить",
-                       command=lambda: graph.draw_epicycloid(2), fg="white")
+                       command=lambda: graph.draw_epicycloid(), fg="white")
 moveButton.place(relx=0.0, rely=3 / 18, relwidth=1, relheight=1 / 18)
 
 # Разделитель
@@ -67,7 +67,7 @@ zoomRatioInput = tk.Entry(inputFrame, justify="center")
 zoomRatioInput.place(relx=0.5, rely=9 / 18, relwidth=0.5, relheight=1 / 18)
 
 zoomButton = tk.Button(inputFrame, justify="center", bg="green", text="Увеличить",
-                       command=lambda: graph.draw_epicycloid(3), fg="white")
+                       command=lambda: graph.draw_epicycloid(), fg="white")
 zoomButton.place(relx=0.0, rely=10 / 18, relwidth=1, relheight=1 / 18)
 
 # Поворот

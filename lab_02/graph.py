@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import tkinter as tk
+import time
 import tkinter.messagebox as tkmsg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -7,68 +8,69 @@ from geometry import Epicycloid
 
 
 class Graph:
-    def __init__(self, parent: tk.Frame):
+    HEIGHT_DEFAULT = 1680
+    WIDTH_DEFAULT = 976
+    Y_SIGN_OFFSET_DEFAULT = 15
+    X_SIGN_OFFSET_DEFAULT = 10
+
+    def __init__(self, parent: tk.Frame, x_offset: int = 0, y_offset: int = 0):
         self.parent = parent
-        self.figure: plt.Figure = plt.figure()
-        self.ax = self.figure.add_subplot()
+        self.canvas = tk.Canvas(parent, bg="white")
+        self.canvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-        axes = self.figure.gca()
-        axes = self.ax
-        axes.set_aspect("equal")
-        axes.plot(1, 0, ">k", transform=axes.get_yaxis_transform(), clip_on=False)
-        axes.plot(0, 1, "^k", transform=axes.get_xaxis_transform(), clip_on=False)
-        axes.set_xlabel("X", loc="right")
-        axes.set_ylabel("Y", loc="top")
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.drawn_epicycloid = None
 
-        # Move the left and bottom spines to x = 0 and y = 0, respectively.
-        axes.spines["left"].set_position(("data", 0))
-        axes.spines["bottom"].set_position(("data", 0))
+        self.draw_axes()
+        self.draw_epicycloid()
 
-        # Hide the top and right spines.
-        axes.spines["top"].set_visible(False)
-        axes.spines["right"].set_visible(False)
-        # axes.set_xlim([-300, 300])
-        # axes.set_ylim([-300, 300])
+    def clear_canvas(self):
+        self.canvas.delete("all")
+        self.draw_axes()
 
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self.parent)
-        self.canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+    def draw_axes(self):
+        width = self.canvas.winfo_width()
+        height = self.canvas.winfo_height()
+        width = 1680 if width == 1 else width
+        height = 976 if height == 1 else height
 
-    def draw_epicycloid(self, a):
-        print(self.ax.lines)
+        # Ось X
+        self.canvas.create_line(self.x_offset, self.y_offset,
+                                width - self.x_offset, self.y_offset,
+                                arrow=tk.LAST)
 
-        self.ax.lines.pop()
+        # Ось Y
+        self.canvas.create_line(self.x_offset, self.y_offset,
+                                self.x_offset, height - self.y_offset,
+                                arrow=tk.LAST)
 
-        epicycloid = Epicycloid(1, a, 2, 3)
+        # Метки на оси X
+        for x_text in range(100, width - 2 * self.x_offset, 100):
+            self.canvas.create_line(x_text + self.x_offset, self.y_offset - 3,
+                                    x_text + self.x_offset, self.y_offset + 3)
+            self.canvas.create_text(x_text + self.x_offset, self.y_offset + self.X_SIGN_OFFSET_DEFAULT,
+                                    text=f"{x_text}")
+
+        # Метки на оси Y
+        for y_text in range(100, height - 2 * self.y_offset, 100):
+            self.canvas.create_line(self.x_offset - 3, y_text + self.y_offset,
+                                    self.x_offset + 3, y_text + self.y_offset)
+            self.canvas.create_text(self.x_offset + self.Y_SIGN_OFFSET_DEFAULT, y_text + self.y_offset,
+                                    text=f"{y_text}")
+
+    def draw_epicycloid(self):
+        self.clear_canvas()
+        epicycloid = Epicycloid(20, 30, 200, 300)
         x, y = epicycloid.create_figure()
 
-        self.ax.plot(x, y)
-        self.canvas.draw()
+        # отрисовка всех линий
+        x1, y1 = x[0], y[0]
+        for x2, y2 in zip(x[1:], y[1:]):
+            self.canvas.create_line(x1 + self.x_offset, y1 + self.y_offset,
+                                    x2 + self.x_offset, y2 + self.y_offset,
+                                    fill="green", width=2)
+            x1 = x2
+            y1 = y2
 
-    # def countAxes(self, triangle):
-    #     localPadding = 2
-    #
-    #     if len(rectangleStore.data) == 0:
-    #         return 0
-    #
-    #     rectangle: Rectangle = rectangleStore.data[0]
-    #     xMax: float = rectangle.cords[0].x
-    #     xMin: float = rectangle.cords[0].x
-    #     yMax: float = rectangle.cords[0].y
-    #     yMin: float = rectangle.cords[0].y
-    #
-    #     for dot in rectangleStore.data[0].getCords():
-    #         xMax = dot.x if dot.x > xMax else xMax
-    #         yMax = dot.y if dot.y > yMax else yMax
-    #         xMin = dot.x if dot.x < xMin else xMin
-    #         yMin = dot.y if dot.y < yMin else yMin
-    #
-    #     if triangle:
-    #         for dot in triangle:
-    #             xMax = dot[0] if dot[0] > xMax else xMax
-    #             yMax = dot[1] if dot[1] > yMax else yMax
-    #             xMin = dot[0] if dot[0] < xMin else xMin
-    #             yMin = dot[1] if dot[1] < yMin else yMin
-    #
-    #     self.data['axisX'] = [xMin - localPadding, xMax + localPadding]
-    #     self.data['axisY'] = [yMin - localPadding, yMax + localPadding]
-    #     return (xMin, xMax), (yMin, yMax)
+        self.drawn_epicycloid = [x1, y1]
