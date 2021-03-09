@@ -1,4 +1,5 @@
 from typing import Tuple, List
+from geometry import Matrix
 
 import matplotlib
 import tkinter as tk
@@ -30,7 +31,7 @@ inputFrame = tk.Frame(root)
 inputFrame.place(relx=0.875, rely=0.0, relwidth=0.125, relheight=1.0, anchor="nw")
 
 # ЗАРАНЕЕ ЛЕЙБЛ С ЦЕНТРОМ
-centerLabel = tk.Label(inputFrame, text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+centerLabel = tk.Label(inputFrame, text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 centerLabel.place(relx=0.0, rely=7 / 18, relwidth=1, relheight=1 / 18)
 
 def change_history(action: str):
@@ -78,7 +79,7 @@ def move():
     change_history(f"Перемещение\nПо x - {x_offset}\nПо y - {y_offset}")
 
     graph.move_epicycloid(x_offset, y_offset)
-    centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+    centerLabel.configure(text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 
 
 moveButton = tk.Button(inputFrame, justify="center", bg="green", text="Переместить",

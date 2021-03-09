@@ -146,27 +146,28 @@ class Graph:
         self.__draw_lines_matrix_array(self.drawn_epicycloid)
 
     def rotate_epicycloid(self, x_center: float = 0, y_center: float = 0, angle: int = 0):
-        # Матрица преобразования для масштабирования
         angle: float = angle / 180 * pi
+
+        # Матрица преобразования для масштабирования (пригодилась бы, будь центр в начале координат)
+        '''
         matrix_transform = Matrix(3, 3, [[cos(angle), -sin(angle), 0],
                                          [sin(angle), cos(angle), 0],
-                                         [x_center, y_center, 1]])
+                                         [0, 0, 1]])
+        '''
 
         # Формируем новые координаты эпициклоида
         for i in range(len(self.drawn_epicycloid)):
-            self.drawn_epicycloid[i] = self.drawn_epicycloid[i] * matrix_transform
-            '''
-            Так это было не через матрицу
             x_old, y_old = self.drawn_epicycloid[i].data[0][0], self.drawn_epicycloid[i].data[0][1]
-            self.drawn_epicycloid[i].data[0][0] = x_center + (x_old - x_center) * cos(angle) + (y_old - y_center) * sin(angle)
-            self.drawn_epicycloid[i].data[0][1] = y_center + (y_old - y_center) * cos(angle) - (x_old - x_center) * sin(angle)
-            '''
+            new_matrix = Matrix(1, 3, [[0, 0, 1]])
+            new_matrix.data[0][0] = x_center + (x_old - x_center) * cos(angle) + (y_old - y_center) * sin(angle)
+            new_matrix.data[0][1] = y_center + (y_old - y_center) * cos(angle) - (x_old - x_center) * sin(angle)
+            self.drawn_epicycloid[i] = new_matrix
+            # self.drawn_epicycloid[i].data[0][0] = x_center + (x_old - x_center) * cos(angle) + (y_old - y_center) * sin(angle)
+            # self.drawn_epicycloid[i].data[0][1] = y_center + (y_old - y_center) * cos(angle) - (x_old - x_center) * sin(angle)
 
         # Вычислить новый центр
-        center_matrix = Matrix(1, 3, [[self.x_center, self.y_center, 0]])
-        center_matrix = center_matrix * matrix_transform
-        self.x_center = center_matrix.data[0][0]
-        self.y_center = center_matrix.data[0][1]
+        self.x_center = x_center + (self.x_center - x_center) * cos(angle) + (self.y_center - y_center) * sin(angle)
+        self.y_center = y_center + (self.y_center - y_center) * cos(angle) - (self.x_center - x_center) * sin(angle)
 
         # Отрисовка
         self.clear_canvas()
