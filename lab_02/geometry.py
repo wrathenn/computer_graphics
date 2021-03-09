@@ -78,3 +78,48 @@ class Epicycloid:
 
         print(x_list, y_list)
         return x_list, y_list
+
+
+class Matrix:
+    def __init__(self, rows: int, columns: int, data: List[List[float]] = None):
+        self.rows = rows
+        self.columns = columns
+        self.data = []
+        if data:
+            for i in data:
+                self.data.append(i)
+        else:
+            for i in range(self.rows):
+                temp_column = []
+                for k in range(self.columns):
+                    temp_column.append(0)
+                self.data.append(temp_column)
+
+    def print(self):
+        for i in range(self.rows):
+            for k in range(self.columns):
+                print(self.data[i][k], end=" ")
+            print()
+
+    def __mul__(self, other):
+        other: Matrix
+        if self.columns != other.rows:
+            print("э")
+            return None
+
+        result: Matrix = Matrix(self.rows, other.columns)
+
+        for second_matrix_column in range(other.columns):
+            for first_matrix_row in range(self.rows):
+                current_element = 0
+                for element_id in range(self.columns):
+                    first_el = self.data[first_matrix_row][element_id]
+                    second_el = other.data[element_id][second_matrix_column]
+                    current_element += self.data[first_matrix_row][element_id] * \
+                                       other.data[element_id][second_matrix_column]
+                result.data[first_matrix_row][second_matrix_column] = current_element
+
+        print("Результат:")
+        result.print()
+
+        return result

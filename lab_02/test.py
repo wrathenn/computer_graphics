@@ -1,12 +1,8 @@
-from geometry import find_two_coprime_ints, Epicycloid
+from geometry import find_two_coprime_ints, Epicycloid, Matrix
 import matplotlib.pyplot as plt
 
-print(find_two_coprime_ints(17, 5.10))
-
-epicycloid = Epicycloid(1, 3, 2, 3)
-x,y = epicycloid.create_figure()
-
-plt.plot(x,y)
-plt.show()
+M1 = Matrix(3, 3, [[1, 0, 0], [0, 1, 0], [10, 15, 1]])
+M2 = Matrix(1, 3, [[2, 3, 1]])
+result = M2 * M1
 
 
