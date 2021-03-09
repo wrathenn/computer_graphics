@@ -22,11 +22,11 @@ def find_two_coprime_ints(a: float, b: float) -> (int, int):
     a_after_dot: int = len(str(a)) - len(str(int(a))) - 1 if len(str(a)) != len(str(math.ceil(a))) else 0
     b_after_dot: int = len(str(b)) - len(str(int(b))) - 1 if len(str(b)) != len(str(math.ceil(b))) else 0
     max_after_dot = a_after_dot if a_after_dot >= b_after_dot else b_after_dot
-    print(a_after_dot, b_after_dot, max_after_dot)
+    # print(a_after_dot, b_after_dot, max_after_dot)
 
     a_new: int = int(a * 10 ** max_after_dot)
     b_new: int = int(b * 10 ** max_after_dot)
-    print(f"a_new - {a_new}, b_new - {b_new}")
+    # print(f"a_new - {a_new}, b_new - {b_new}")
 
     # Пусть а >= b
     swap_flag = 0
@@ -59,7 +59,7 @@ class Epicycloid:
         self.x0 = x0
         self.y0 = y0
 
-    def get_coordinates(self, angle) -> (float, float):
+    def __get_coordinates(self, angle) -> (float, float):
         x: float = (self.a + self.b) * math.cos(angle) - self.a * math.cos((self.a + self.b) * angle / self.a) + self.x0
         y: float = (self.a + self.b) * math.sin(angle) - self.a * math.sin((self.a + self.b) * angle / self.a) + self.y0
         return x, y
@@ -72,11 +72,11 @@ class Epicycloid:
 
         for i in range(0, 2 * p * 180, self.DRAW_STEP_ANGLE):
             current_angle: float = i / 180 * math.pi
-            current_x, current_y = self.get_coordinates(current_angle)
+            current_x, current_y = self.__get_coordinates(current_angle)
             x_list.append(current_x)
             y_list.append(current_y)
 
-        print(x_list, y_list)
+        # print(x_list, y_list)
         return x_list, y_list
 
 
@@ -104,7 +104,6 @@ class Matrix:
     def __mul__(self, other):
         other: Matrix
         if self.columns != other.rows:
-            print("э")
             return None
 
         result: Matrix = Matrix(self.rows, other.columns)
@@ -119,7 +118,7 @@ class Matrix:
                                        other.data[element_id][second_matrix_column]
                 result.data[first_matrix_row][second_matrix_column] = current_element
 
-        print("Результат:")
-        result.print()
+        # print("Результат:")
+        # result.print()
 
         return result

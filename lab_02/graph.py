@@ -15,6 +15,11 @@ class Graph:
     Y_SIGN_OFFSET_DEFAULT = 15
     X_SIGN_OFFSET_DEFAULT = 10
 
+    A_EPICYCLOID_DEFAULT = 50
+    B_EPICYCLOID_DEFAULT = 150
+    X_C_EPICYCLOID_DEFAULT = 700
+    Y_C_EPICYCLOID_DEFAULT = 600
+
     def __init__(self, parent: tk.Frame, x_offset: float = 0, y_offset: float = 0):
         self.parent = parent
         self.canvas: tk.Canvas = tk.Canvas(parent, bg="white")
@@ -27,7 +32,10 @@ class Graph:
         self.y_center: float = 0
 
         self.draw_axes()
-        self.draw_epicycloid(50, 150, 700, 600)
+        epicycloid = Epicycloid(self.A_EPICYCLOID_DEFAULT, self.B_EPICYCLOID_DEFAULT,
+                                self.X_C_EPICYCLOID_DEFAULT, self.Y_C_EPICYCLOID_DEFAULT)
+        x, y = epicycloid.create_figure()
+        self.draw_epicycloid(x, y, self.X_C_EPICYCLOID_DEFAULT, self.Y_C_EPICYCLOID_DEFAULT)
 
     def clear_canvas(self):
         self.canvas.delete("all")
@@ -76,13 +84,16 @@ class Graph:
                                     fill="green", width=2)
             x1, y1 = x2, y2
 
-    def draw_epicycloid(self, a: float, b: float, x_center: float, y_center: float) -> None:
+    def redraw_epicycloid(self, array):
+        self.clear_canvas()
+        self.drawn_epicycloid = array
+        self.__draw_lines_matrix_array(self.drawn_epicycloid)
+
+    def draw_epicycloid(self, x: List[float], y: List[float], x_center, y_center) -> None:
         self.clear_canvas()
 
         self.x_center = x_center
         self.y_center = y_center
-        epicycloid = Epicycloid(a, b, x_center, y_center)
-        x, y = epicycloid.create_figure()
 
         # запомнить точки, составляющие эпициклоид
         self.drawn_epicycloid: List[Matrix] = []
@@ -118,11 +129,17 @@ class Graph:
                                          [0, 0, 1]])
 
         # Формируем новые координаты эпициклоида
-        # X1 = X*Kx + (1-Kx)*Xc & Y1 = Y*Ky + (1-Ky)*Yc
+        # X1 = X * Kx + (1 - Kx) * Xc   &   Y1 = Y * Ky + (1 - Ky) * Yc
         for i in range(len(self.drawn_epicycloid)):
             self.drawn_epicycloid[i] = self.drawn_epicycloid[i] * matrix_transform
             self.drawn_epicycloid[i].data[0][0] += (1 - scale_x) * x_center
             self.drawn_epicycloid[i].data[0][1] += (1 - scale_y) * y_center
+
+        # Посчитать новый центр, если вдруг центром была выбрана другая точка
+        center_matrix = Matrix(1, 3, [[self.x_center, self.y_center, 0]])
+        center_matrix = center_matrix * matrix_transform
+        self.x_center = center_matrix.data[0][0] + (1 - scale_x) * x_center
+        self.y_center = center_matrix.data[0][1] + (1 - scale_y) * y_center
 
         # Отрисовка
         self.clear_canvas()
@@ -144,6 +161,12 @@ class Graph:
             self.drawn_epicycloid[i].data[0][0] = x_center + (x_old - x_center) * cos(angle) + (y_old - y_center) * sin(angle)
             self.drawn_epicycloid[i].data[0][1] = y_center + (y_old - y_center) * cos(angle) - (x_old - x_center) * sin(angle)
             '''
+
+        # Вычислить новый центр
+        center_matrix = Matrix(1, 3, [[self.x_center, self.y_center, 0]])
+        center_matrix = center_matrix * matrix_transform
+        self.x_center = center_matrix.data[0][0]
+        self.y_center = center_matrix.data[0][1]
 
         # Отрисовка
         self.clear_canvas()
