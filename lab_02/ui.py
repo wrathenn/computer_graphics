@@ -1,5 +1,5 @@
 from typing import Tuple, List
-from geometry import Matrix
+from geometry import Matrix, Epicycloid
 
 import matplotlib
 import tkinter as tk
@@ -34,6 +34,7 @@ inputFrame.place(relx=0.875, rely=0.0, relwidth=0.125, relheight=1.0, anchor="nw
 centerLabel = tk.Label(inputFrame, text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 centerLabel.place(relx=0.0, rely=7 / 18, relwidth=1, relheight=1 / 18)
 
+
 def change_history(action: str):
     if len(action_history) == 3:
         action_history.pop(0)
@@ -44,6 +45,7 @@ def change_history(action: str):
     center_history.append((graph.x_center, graph.y_center))
 
     lastActionText.configure(text=action_history[len(action_history) - 1] if len(action_history) else "")
+
 
 # Переместить
 
@@ -133,12 +135,12 @@ def scale():
     try:
         x_center = float(centerXInput.get())
     except ValueError:
-        tkmsg.showerror("Ошибка!", "Некорректное смещение по X")
+        tkmsg.showerror("Ошибка!", "Некорректный центр X")
         return
     try:
         y_center = float(centerYInput.get())
     except ValueError:
-        tkmsg.showerror("Ошибка!", "Некорректное смещение по Y")
+        tkmsg.showerror("Ошибка!", "Некорректный центр Y")
         return
 
     change_history(f"Масштабирование\nПо x - {x_scale}\nПо y -  {y_scale}\nЦентр - {x_center}, {y_center}")
@@ -174,12 +176,12 @@ def rotate():
     try:
         x_center = float(centerXInput.get())
     except ValueError:
-        tkmsg.showerror("Ошибка!", "Некорректное смещение по X")
+        tkmsg.showerror("Ошибка!", "Некорректный центр X")
         return
     try:
         y_center = float(centerYInput.get())
     except ValueError:
-        tkmsg.showerror("Ошибка!", "Некорректное смещение по Y")
+        tkmsg.showerror("Ошибка!", "Некорректный центр Y")
         return
 
     change_history(f"Масштабирование\nНа угол {angle}\nЦентр - {x_center}, {y_center}")
@@ -193,12 +195,9 @@ rotationButton = tk.Button(inputFrame, justify="center", bg="green", text="По�
 rotationButton.place(relx=0.0, rely=14 / 18, relwidth=1, relheight=1 / 18)
 
 # Правка
-rotationLabel = tk.Label(inputFrame, text="Правка")
-rotationLabel.place(relx=0.0, rely=15 / 18, relwidth=1, relheight=1 / 18)
-
 lastActionText = tk.Label(inputFrame, justify=tk.LEFT, state=tk.NORMAL, font="ubuntu 14", fg="black", bg="white",
-                          anchor="nw", text="Предыдущее действие?")
-lastActionText.place(relx=0.0, rely=16 / 18, relwidth=1, relheight=1 / 18)
+                          anchor="nw", text="Предыдущее действие")
+lastActionText.place(relx=0.0, rely=15 / 18, relwidth=1, relheight=2 / 18)
 
 
 def undo():
@@ -217,8 +216,85 @@ def undo():
     centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
 
 
-undoButton = tk.Button(inputFrame, justify="center", bg="green", text="Отмена",
+undoButton = tk.Button(inputFrame, justify="center", bg="red", text="Отмена",
                        command=lambda: undo(), fg="white")
 undoButton.place(relx=0.0, rely=17 / 18, relwidth=1, relheight=1 / 18)
+
+
+# Изменения свойств эпициклоида
+def change_figure():
+    change_root = tk.Tk()
+    change_root.title("Изменить эпициклоид")
+    change_root.geometry("300x600")
+
+    change_main_frame = tk.Frame(change_root)
+    change_main_frame.place(relx=0.0, rely=0.0, relwidth=1, relheight=1, anchor="nw")
+
+    changeALabel = tk.Label(change_main_frame, text=f"a (r)", justify="center")
+    changeALabel.place(relx=0.0, rely=0.0, relwidth=0.5, relheight=0.2)
+    changeAInput = tk.Entry(change_main_frame, justify="center")
+    changeAInput.place(relx=0.5, rely=0.0, relwidth=0.5, relheight=0.2)
+
+    changeBLabel = tk.Label(change_main_frame, text=f"b (R)", justify="center")
+    changeBLabel.place(relx=0.0, rely=0.2, relwidth=0.5, relheight=0.2)
+    changeBInput = tk.Entry(change_main_frame, justify="center")
+    changeBInput.place(relx=0.5, rely=0.2, relwidth=0.5, relheight=0.2)
+
+    changeXLabel = tk.Label(change_main_frame, text=f"x центра", justify="center")
+    changeXLabel.place(relx=0.0, rely=0.4, relwidth=0.5, relheight=0.2)
+    changeXInput = tk.Entry(change_main_frame, justify="center")
+    changeXInput.place(relx=0.5, rely=0.4, relwidth=0.5, relheight=0.2)
+
+    changeYLabel = tk.Label(change_main_frame, text=f"y центра", justify="center")
+    changeYLabel.place(relx=0.0, rely=0.6, relwidth=0.5, relheight=0.2)
+    changeYInput = tk.Entry(change_main_frame, justify="center")
+    changeYInput.place(relx=0.5, rely=0.6, relwidth=0.5, relheight=0.2)
+
+    def local_change():
+        new_a: float
+        new_b: float
+        new_x: float
+        new_y: float
+        try:
+            new_a = float(changeAInput.get())
+        except ValueError:
+            tkmsg.showerror("Ошибка!", "Некорректно введено значение a (r)")
+            return
+        try:
+            new_b = float(changeBInput.get())
+        except ValueError:
+            tkmsg.showerror("Ошибка!", "Некорректно введено значение b (R)")
+            return
+        try:
+            new_x = float(changeXInput.get())
+        except ValueError:
+            tkmsg.showerror("Ошибка!", "Некорректно введено значение X")
+            return
+        try:
+            new_y = float(changeYInput.get())
+        except ValueError:
+            tkmsg.showerror("Ошибка!", "Некорректно введено значение Y")
+            return
+
+        new_epicycloid = Epicycloid(new_a, new_b, new_x, new_y)
+        new_x_list, new_y_list = new_epicycloid.create_figure()
+
+        change_history(f"Новая фигура - {new_a:.3f}, {new_b:.3f}\n{new_x:.3f}, {new_y:.3f}, ")
+
+        graph.draw_epicycloid(new_x_list, new_y_list, new_x, new_y)
+        centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+
+        change_root.destroy()
+
+    changeButton = tk.Button(change_main_frame, justify="center", bg="green", text="Изменить",
+                             command=lambda: local_change(), fg="white")
+    changeButton.place(relx=0.0, rely=0.8, relwidth=1, relheight=0.2)
+
+    change_root.mainloop()
+
+
+changeFigureButton = tk.Button(mainFrame, justify="center", bg="orange", text="Новая фигура",
+                               command=lambda: change_figure(), fg="black")
+changeFigureButton.place(relx=0.90, rely=0.95, relheight=0.05, relwidth=0.10)
 
 root.mainloop()
