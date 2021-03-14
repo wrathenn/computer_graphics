@@ -144,7 +144,7 @@ def scale():
     change_history(f"Масштабирование\nПо x - {x_scale}\nПо y -  {y_scale}\nЦентр - {x_center}, {y_center}")
 
     graph.scale_epicycloid(x_center, y_center, x_scale, y_scale)
-    centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+    centerLabel.configure(text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 
 
 scaleButton = tk.Button(inputFrame, justify="center", bg="green", text="Увеличить",
@@ -185,7 +185,7 @@ def rotate():
     change_history(f"Масштабирование\nНа угол {angle}\nЦентр - {x_center}, {y_center}")
 
     graph.rotate_epicycloid(x_center, y_center, angle)
-    centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+    centerLabel.configure(text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 
 
 rotationButton = tk.Button(inputFrame, justify="center", bg="green", text="Повернуть",
@@ -193,12 +193,9 @@ rotationButton = tk.Button(inputFrame, justify="center", bg="green", text="По�
 rotationButton.place(relx=0.0, rely=14 / 18, relwidth=1, relheight=1 / 18)
 
 # Правка
-rotationLabel = tk.Label(inputFrame, text="Правка")
-rotationLabel.place(relx=0.0, rely=15 / 18, relwidth=1, relheight=1 / 18)
-
 lastActionText = tk.Label(inputFrame, justify=tk.LEFT, state=tk.NORMAL, font="ubuntu 14", fg="black", bg="white",
-                          anchor="nw", text="Предыдущее действие?")
-lastActionText.place(relx=0.0, rely=16 / 18, relwidth=1, relheight=1 / 18)
+                          anchor="nw", text="")
+lastActionText.place(relx=0.0, rely=15 / 18, relwidth=1, relheight=2 / 18)
 
 
 def undo():
@@ -214,11 +211,11 @@ def undo():
     center_history.pop(id)
 
     lastActionText.configure(text=action_history[len(action_history) - 1] if len(action_history) else "")
-    centerLabel.configure(text=f"Центр эпициклоида: {graph.x_center:.3f}, {graph.y_center:.3f}")
+    centerLabel.configure(text=f"Центр эпициклоида:\n{graph.x_center:.3f}, {graph.y_center:.3f}")
 
 
-undoButton = tk.Button(inputFrame, justify="center", bg="green", text="Отмена",
-                       command=lambda: undo(), fg="white")
+undoButton = tk.Button(inputFrame, justify="center", bg="orange", text="Отмена",
+                       command=lambda: undo(), fg="black")
 undoButton.place(relx=0.0, rely=17 / 18, relwidth=1, relheight=1 / 18)
 
 root.mainloop()
