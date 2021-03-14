@@ -71,6 +71,12 @@ class Graph:
             self.canvas.create_text(self.x_offset + self.Y_SIGN_OFFSET_DEFAULT, y_text + self.y_offset,
                                     text=f"{y_text}")
 
+        # Подписи X, Y, 0
+        self.canvas.create_text(self.x_offset + self.X_SIGN_OFFSET_DEFAULT, self.y_offset + self.Y_SIGN_OFFSET_DEFAULT,
+                                text="0")
+        self.canvas.create_text(width - self.x_offset, self.y_offset + self.Y_SIGN_OFFSET_DEFAULT, text="X")
+        self.canvas.create_text(self.x_offset + self.X_SIGN_OFFSET_DEFAULT, height - self.y_offset, text="Y")
+
     # Рисует линии на заданном canvas, проходя по массиву 1х2/1х3 матриц с координатами точек
     def __draw_lines_matrix_array(self, array: List[Matrix]) -> None:
         if not array:
