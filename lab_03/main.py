@@ -18,6 +18,7 @@ class App:
         style.configure('Vertical.TScrollbar', arrowsize=28)
 
         self.initGUI()
+        self.canvas.clear()
         self.window.mainloop()
 
     def initGUI(self):
@@ -146,8 +147,8 @@ class App:
         self.drawSpectrumAngleLabel.place(relx=0, rely=0.2, relwidth=0.1)
         self.drawSpectrumAngleEntry.place(relx=0.1, rely=0.2, relwidth=0.15)
 
-        self.drawSpectrumLengthLabel.place(relx=0.25, rely=0.2, relwidth=0.1)
-        self.drawSpectrumLengthEntry.place(relx=0.35, rely=0.2, relwidth=0.15)
+        self.drawSpectrumLengthLabel.place(relx=0.28, rely=0.2, relwidth=0.1)
+        self.drawSpectrumLengthEntry.place(relx=0.38, rely=0.2, relwidth=0.15)
 
         self.drawSpectrumColorComboBox = Combobox(
             self.drawSpectrumFrame,
@@ -289,6 +290,5 @@ class App:
 
     def getSpectrumColor(self):
         return self.colors[self.drawSpectrumColorComboBox.get()]
-
 
 app = App()
