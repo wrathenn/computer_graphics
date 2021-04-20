@@ -5,72 +5,67 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def compareTime():
-    angle = angleToRadians(30)
-    lenList = [10, 100, 200, 300, 400, 500]
+#                 "Каноническое уравнение",
+#                 "Параметрическое уравнение",
+#                 "Алгоритм Брезенхема",
+#                 "Алгоритм средней точки",
+#                 "Библиотечная функция"
+
+def compareCircleTime():
+    rList = [10, 100, 200, 300, 400, 500]
     xStart, yStart = 1, 1
 
-    ddaStore = list()
-    bresIntStore = list()
-    bresDoubleStore = list()
-    bresReduceStore = list()
-    wuStore = list()
+    normalStore = list()
+    parameterStore = list()
+    bresStore = list()
+    middleStore = list()
     libStore = list()
 
     drawer = Drawer(None, "white")
     modifier = 1000
-    repeats = 100
+    repeats = 5
 
-    def testDDA(x0, y0, x1, y1, color="#FF0000"):
+    def testNormal(x0, y0, r, color="#FF0000"):
         timeBegin = time.time()
         for i in range(repeats):
-            drawer.drawLine(digitalDiffAnalyzer(x0, y0, x1, y1), color)
+            drawer.drawLine(drawCircleNormal(x0, y0, r), color)
         timeEnd = time.time()
-        ddaStore.append(int((timeEnd - timeBegin) * modifier))
+        normalStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresInt(x0, y0, x1, y1, color="#FF0000"):
+    def testParameter(x0, y0, r, color="#FF0000"):
         timeBegin = time.time()
         for i in range(repeats):
-            drawer.drawLine(bresenhamInt(x0, y0, x1, y1), color)
+            drawer.drawLine(drawCircleParameter(x0, y0, r), color)
         timeEnd = time.time()
-        bresIntStore.append(int((timeEnd - timeBegin) * modifier))
+        parameterStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresDouble(x0, y0, x1, y1, color="#FF0000"):
+    def testBres(x0, y0, r, color="#FF0000"):
         timeBegin = time.time()
         for i in range(repeats):
-            drawer.drawLine(bresenhamDouble(x0, y0, x1, y1), color)
+            drawer.drawLine(drawCircleBresenham(x0, y0, r), color)
         timeEnd = time.time()
-        bresDoubleStore.append(int((timeEnd - timeBegin) * modifier))
+        bresStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresReduce(x0, y0, x1, y1, color="#FF0000"):
+    def testMiddle(x0, y0, r, color="#FF0000"):
         timeBegin = time.time()
         for i in range(repeats):
-            drawer.drawLineWithColor(bresenhamStairsReduce(x0, y0, x1, y1, color))
+            drawer.drawLine(drawCircleMiddlePoint(x0, y0, r), color)
         timeEnd = time.time()
-        bresReduceStore.append(int((timeEnd - timeBegin) * modifier))
+        middleStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresWu(x0, y0, x1, y1, color="#FF0000"):
+    def testLib(x0, y0, r, color="#FF0000"):
         timeBegin = time.time()
         for i in range(repeats):
-            drawer.drawLineWithColor(wu(x0, y0, x1, y1, color))
-        timeEnd = time.time()
-        wuStore.append(int((timeEnd - timeBegin) * modifier))
-
-    def testLib(x0, y0, x1, y1, color="#FF0000"):
-        timeBegin = time.time()
-        for i in range(repeats):
-            drawer.create_line(x0, y0, x1, y1, fill=color)
+            drawer.create_oval(x0 - r, y0 - r, x0 + r, y0 + r, outline=color)
         timeEnd = time.time()
         libStore.append(int((timeEnd - timeBegin) * modifier))
 
-    for len in lenList:
-        xEnd, yEnd = int(xStart + len * math.cos(angle)), int(yStart + len * math.sin(angle))
-        testDDA(xStart, yStart, xEnd, yEnd)
-        testBresInt(xStart, yStart, xEnd, yEnd)
-        testBresDouble(xStart, yStart, xEnd, yEnd)
-        testBresReduce(xStart, yStart, xEnd, yEnd)
-        testBresWu(xStart, yStart, xEnd, yEnd)
-        testLib(xStart, yStart, xEnd, yEnd)
+    for r in rList:
+        testNormal(xStart, yStart, r)
+        testParameter(xStart, yStart, r)
+        testBres(xStart, yStart, r)
+        testMiddle(xStart, yStart, r)
+        testLib(xStart, yStart, r)
 
     barWidth = 0.4 / 3
     x1 = np.arange(1, 7) - barWidth * 3
@@ -78,22 +73,19 @@ def compareTime():
     x3 = np.arange(1, 7) - barWidth
     x4 = np.arange(1, 7)
     x5 = np.arange(1, 7) + barWidth
-    x6 = np.arange(1, 7) + barWidth * 2
-    y1 = ddaStore
-    y2 = bresIntStore
-    y3 = bresDoubleStore
-    y4 = bresReduceStore
-    y5 = wuStore
-    y6 = libStore
+    y1 = normalStore
+    y2 = parameterStore
+    y3 = bresStore
+    y4 = middleStore
+    y5 = libStore
 
     fig, ax = plt.subplots()
-    ax.set_title(f"Сравнение времени на отрезках длиной {lenList} (в с * {modifier})")
-    ax.bar(x1, y1, width=barWidth, label="Цифровой дифференциальный анализатор")
-    ax.bar(x2, y2, width=barWidth, label="Целочисленный алгоритм Брезенхема")
-    ax.bar(x3, y3, width=barWidth, label="Вещественный алгоритм Брезенхема")
-    ax.bar(x4, y4, width=barWidth, label="Алгоритм Брезенхема с устранением ступенчатости")
-    ax.bar(x5, y5, width=barWidth, label="Алгоритм Ву")
-    ax.bar(x6, y6, width=barWidth, label="Библиотечная функция")
+    ax.set_title(f"Сравнение времени на окружностях радиуса {rList} (в с * {modifier})")
+    ax.bar(x1, y1, width=barWidth, label="Каноническое уравнение")
+    ax.bar(x2, y2, width=barWidth, label="Параметрическое уравнение")
+    ax.bar(x3, y3, width=barWidth, label="Алгоритм Брезенхема")
+    ax.bar(x4, y4, width=barWidth, label="Алгоритм средней точки")
+    ax.bar(x5, y5, width=barWidth, label="Библиотечная функция")
 
     ax.legend()
     ax.set_facecolor('seashell')
@@ -101,78 +93,91 @@ def compareTime():
     fig.set_figheight(6)  # высота Figure
     fig.set_facecolor('floralwhite')
 
-    print(f"Время в с*{modifier}:")
-    print(f"Цифровой дифференциальный анализатор:", ddaStore)
-    print(f"Целочисленный алгоритм Брезенхема:", bresIntStore)
-    print(f"Вещественный алгоритм Брезенхема:", bresDoubleStore)
-    print(f"Алгоритм Брезенхема с устранением ступенчатости:", bresReduceStore)
-    print(f"Алгоритм Ву:", wuStore)
+    print(f"Каноническое уравнение", normalStore)
+    print(f"Параметрическое уравнение", parameterStore)
+    print(f"Алгоритм Брезенхема", bresStore)
+    print(f"Алгоритм средней точки", middleStore)
+    print(f"Библиотечная функция", libStore)
 
     plt.show()
 
 
-def countStairs(dotList, isWu: bool = False):
-    dot0 = dotList[0]
-    step = 2 if isWu else 1
-    stairs = 0
-    for i in range(step, len(dotList), step):
-        dot1 = dotList[i]
-        if (abs(dot0[0] - dot1[0]) != 0 and abs(dot0[1] - dot1[1]) != 0):
-            stairs += 1
-        dot0 = dot1
+def compareEllipseTime():
+    rhList = [10, 100, 200, 300, 400, 500]
+    rwList = [30, 300, 600, 900, 1200, 1500]
+    xStart, yStart = 1, 1
 
-    return stairs
+    normalStore = list()
+    parameterStore = list()
+    bresStore = list()
+    middleStore = list()
+    libStore = list()
 
+    drawer = Drawer(None, "white")
+    modifier = 1000
+    repeats = 5
 
-def compareStairs():
-    angleListDegrees = (5, 10, 30, 45, 70, 90)
-    angleList = list(map(angleToRadians, angleListDegrees))
-    len = 100
-    xStart, yStart = 0, 0
+    def testNormal(x0, y0, rw, rh, color="#FF0000"):
+        timeBegin = time.time()
+        for i in range(repeats):
+            drawer.drawLine(drawEllipseNormal(x0, y0, rw, rh), color)
+        timeEnd = time.time()
+        normalStore.append(int((timeEnd - timeBegin) * modifier))
 
-    ddaStore = list()
-    bresIntStore = list()
-    bresDoubleStore = list()
-    bresReduceStore = list()
-    wuStore = list()
+    def testParameter(x0, y0, rw, rh, color="#FF0000"):
+        timeBegin = time.time()
+        for i in range(repeats):
+            drawer.drawLine(drawEllipseParameter(x0, y0, rw, rh), color)
+        timeEnd = time.time()
+        parameterStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testDDA(x0, y0, x1, y1, color="#FF0000"):
-        ddaStore.append(countStairs(digitalDiffAnalyzer(x0, y0, x1, y1)))
+    def testBres(x0, y0, rw, rh, color="#FF0000"):
+        timeBegin = time.time()
+        for i in range(repeats):
+            drawer.drawLine(drawEllipseBresenham(x0, y0, rw, rh), color)
+        timeEnd = time.time()
+        bresStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresInt(x0, y0, x1, y1, color="#FF0000"):
-        bresIntStore.append(countStairs(bresenhamInt(x0, y0, x1, y1)))
+    def testMiddle(x0, y0, rw, rh, color="#FF0000"):
+        timeBegin = time.time()
+        for i in range(repeats):
+            drawer.drawLine(drawEllipseMiddlePoint(x0, y0, rw, rh), color)
+        timeEnd = time.time()
+        middleStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresDouble(x0, y0, x1, y1, color="#FF0000"):
-        bresDoubleStore.append(countStairs(bresenhamDouble(x0, y0, x1, y1)))
+    def testLib(x0, y0, rw, rh, color="#FF0000"):
+        timeBegin = time.time()
+        for i in range(repeats):
+            drawer.create_oval(x0 - rw, y0 - rh, x0 + rw, y0 + rh, outline=color)
+        timeEnd = time.time()
+        libStore.append(int((timeEnd - timeBegin) * modifier))
 
-    def testBresReduce(x0, y0, x1, y1, color="#FF0000"):
-        bresReduceStore.append(countStairs(bresenhamStairsReduce(x0, y0, x1, y1, color)))
+    for rW, rH in zip(rwList, rhList):
+        testNormal(xStart, yStart, rW, rH)
+        testParameter(xStart, yStart, rW, rH)
+        testBres(xStart, yStart, rW, rH)
+        testMiddle(xStart, yStart, rW, rH)
+        testLib(xStart, yStart, rW, rH)
 
-    def testBresWu(x0, y0, x1, y1, color="#FF0000"):
-        wuStore.append(countStairs(wu(x0, y0, x1, y1, color), isWu=True))
-
-    for angle in angleList:
-        xEnd, yEnd = int(len * math.cos(angle)), int(len * math.sin(angle))
-        testDDA(xStart, yStart, xEnd, yEnd)
-        testBresInt(xStart, yStart, xEnd, yEnd)
-        testBresDouble(xStart, yStart, xEnd, yEnd)
-        testBresReduce(xStart, yStart, xEnd, yEnd)
-        testBresWu(xStart, yStart, xEnd, yEnd)
-
-    x = angleListDegrees
-    y1 = ddaStore
-    y2 = bresIntStore
-    y3 = bresDoubleStore
-    y4 = bresReduceStore
-    y5 = wuStore
+    barWidth = 0.4 / 3
+    x1 = np.arange(1, 7) - barWidth * 3
+    x2 = np.arange(1, 7) - barWidth * 2
+    x3 = np.arange(1, 7) - barWidth
+    x4 = np.arange(1, 7)
+    x5 = np.arange(1, 7) + barWidth
+    y1 = normalStore
+    y2 = parameterStore
+    y3 = bresStore
+    y4 = middleStore
+    y5 = libStore
 
     fig, ax = plt.subplots()
-    ax.set_title(f"Сравнение времени при углах {x}")
-    ax.plot(x, y1, label="Цифровой дифференциальный анализатор")
-    ax.plot(x, y2, label="Целочисленный алгоритм Брезенхема")
-    ax.plot(x, y3, label="Вещественный алгоритм Брезенхема")
-    ax.plot(x, y4, label="Алгоритм Брезенхема с устранением ступенчатости")
-    ax.plot(x, y5, label="Алгоритм Ву")
+    ax.set_title(f"Сравнение времени на эллипсах радиусами {rwList}, {rhList} (в с * {modifier})")
+    ax.bar(x1, y1, width=barWidth, label="Каноническое уравнение")
+    ax.bar(x2, y2, width=barWidth, label="Параметрическое уравнение")
+    ax.bar(x3, y3, width=barWidth, label="Алгоритм Брезенхема")
+    ax.bar(x4, y4, width=barWidth, label="Алгоритм средней точки")
+    ax.bar(x5, y5, width=barWidth, label="Библиотечная функция")
 
     ax.legend()
     ax.set_facecolor('seashell')
@@ -180,11 +185,10 @@ def compareStairs():
     fig.set_figheight(6)  # высота Figure
     fig.set_facecolor('floralwhite')
 
-    print("Количество ступенек:")
-    print(f"Цифровой дифференциальный анализатор:", ddaStore)
-    print(f"Целочисленный алгоритм Брезенхема:", bresIntStore)
-    print(f"Вещественный алгоритм Брезенхема:", bresDoubleStore)
-    print(f"Алгоритм Брезенхема с устранением ступенчатости:", bresReduceStore)
-    print(f"Алгоритм Ву:", wuStore)
+    print(f"Каноническое уравнение", normalStore)
+    print(f"Параметрическое уравнение", parameterStore)
+    print(f"Алгоритм Брезенхема", bresStore)
+    print(f"Алгоритм средней точки", middleStore)
+    print(f"Библиотечная функция", libStore)
 
     plt.show()
