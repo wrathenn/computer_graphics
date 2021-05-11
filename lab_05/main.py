@@ -11,6 +11,7 @@ from typing import List, Tuple
 class App:
     def __init__(self):
         self.window = Tk()
+        self.window.geometry("1920x1080")
         self.window.title("Лабораторная работа №3: алгоритмы построения отрезков")
         self.window.attributes("-zoomed", True)
 
@@ -76,10 +77,10 @@ class App:
         self.plotFrame = Frame(self.window)
         self.canvas = Drawer(self.plotFrame, bg="white")
         self.canvas.pack(fill=BOTH, expand=True)
-        self.plotFrame.place(relx=0.3, rely=0, relwidth=0.7, relheight=1)
+        self.plotFrame.place(x=500, y=0, width=1420, height=1080)
 
         self.paramsFrame = Frame(self.window)
-        self.paramsFrame.place(relx=0, rely=0, relwidth=0.3, relheight=1)
+        self.paramsFrame.place(relx=0, rely=0, width=500, height=1080)
 
         self.drawParamsFrame = LabelFrame(self.paramsFrame, text="Параметры")
         self.drawParamsFrame.place(relx=0, rely=0, relwidth=1, relheight=0.875)
@@ -92,12 +93,16 @@ class App:
         self.cur: int = 0
 
         def leftClick(event):
+            print("on canvas - ", (event.x, event.y))
             self.figureList[self.cur].append((event.x, event.y))
-            self.canvas.create_oval(event.x,
-                                    event.y,
-                                    event.x,
-                                    event.y,
-                                    width=2, outline=self.getCurveColor())
+            # (event.x - self.canvas.offsetX, event.y - self.canvas.offsetY)
+            self.canvas.img.put(self.getCurveColor(), (event.x, event.y))
+            self.canvas.create_image((0,0), image=self.canvas.img, state="normal", anchor="nw")
+            # self.canvas.create_oval(event.x,
+            #                         event.y,
+            #                         event.x,
+            #                         event.y,
+            #                         width=2, outline=self.getCurveColor())
 
             tmpLen: int = len(self.figureList[self.cur])
             if tmpLen > 1:
@@ -190,6 +195,9 @@ class App:
         self.figureList.append([])
 
     def clear(self):
+        w, h = self.getCanvasSize()
+        print(w,h)
+
         self.figureList = [[]]
         self.cur = 0
         self.canvas.clear()
@@ -209,6 +217,5 @@ class App:
 
     def getCurveColor(self):
         return self.colors[self.drawCurveColorComboBox.get()]
-
 
 app = App()
