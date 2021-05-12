@@ -1,4 +1,8 @@
 from tkinter import *
+from typing import List, Tuple
+
+from draw_backend import ddaSegment
+
 
 class Drawer(Canvas):
     def __init__(self, master, bg):
@@ -14,10 +18,21 @@ class Drawer(Canvas):
             # self.create_oval(x + self.offsetX, y + self.offsetY, x + self.offsetX, y + self.offsetY, outline=color,
             #                  width=1)
         # 688, 503)
-        self.create_image((0,0), image=self.img, state="normal", anchor="nw")
+        self.create_image((0, 0), image=self.img, state="normal", anchor="nw")
+
+    def imgDrawLine(self, x1, y1, x2, y2, color):
+        lineDots = ddaSegment(x1, y1, x2, y2)
+        for dot in lineDots:
+            self.img.put(color, dot)
+
+    def redraw(self):
+        self.delete("all")
+        self.create_image((0, 0), image=self.img, state="normal", anchor="nw")
+        self.drawAxes()
 
     def clear(self):
         self.delete("all")
+        self.img = PhotoImage(width=1344, height=976)
         self.drawAxes()
 
     def getCanvasSize(self):
@@ -53,9 +68,34 @@ class Drawer(Canvas):
         self.create_text(width - self.offsetX, self.offsetY + self.offsetAxes, text="X")
         self.create_text(self.offsetX + self.offsetAxes, height - self.offsetY, text="Y")
 
-    def getColorOfPixel(self, x, y):
-        x = self.winfo_rootx()
-        y += self.winfo_rooty()
-        a = self.find_overlapping(x, y, x, y)
-        # img = ImageGrab.grab((x, y, x + 1, y + 1))
-        return a
+    def getColorOfPixel(self, x: int, y: int) -> str:
+        colorTuple = self.img.get(x, y)
+        color = "#" + f"{colorTuple[0]:X}" + f"{colorTuple[1]:X}" + f"{colorTuple[2]:X}"
+        return color
+
+    def fillFigure(self, figureList: List[List[Tuple[int, int]]], isDelayed: bool = False) -> None:
+        uniqueColor = "#BOOB69"
+        bgColor = "#FFFFFF"
+        # Найти максимумы
+        xMax: int = figureList[0][0][0]
+        xMin: int = figureList[0][0][0]
+        yMax: int = figureList[0][0][0]
+        yMin: int = figureList[0][0][0]
+
+        figure: List[Tuple[int, int]]
+        for figure in figureList:
+            for dot in figure:
+                xMax = max(dot[0], xMax)
+                xMin = min(dot[0], xMin)
+                yMax = max(dot[1], yMax)
+                yMin = min(dot[1], yMin)
+
+        inFigure: bool = False
+        for figure in figureList:
+            for dot in figure:
+                xMax = max(dot[0], xMax)
+                xMin = min(dot[0], xMin)
+                yMax = max(dot[1], yMax)
+                yMin = min(dot[1], yMin)
+
+
