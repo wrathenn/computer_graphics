@@ -1,3 +1,4 @@
+import math
 from tkinter import *
 from typing import List, Tuple
 
@@ -73,8 +74,8 @@ class Drawer(Canvas):
         color = "#" + f"{colorTuple[0]:X}" + f"{colorTuple[1]:X}" + f"{colorTuple[2]:X}"
         return color
 
-    def fillFigure(self, figureList: List[List[Tuple[int, int]]], isDelayed: bool = False) -> None:
-        uniqueColor = "#BOOB69"
+    def fillFigure(self, figureList: List[List[Tuple[int, int]]], fillColor="#F0F0F0", isDelayed: bool = False) -> None:
+        uniqueColor = "#0000FF"
         bgColor = "#FFFFFF"
         # Найти максимумы
         xMax: int = figureList[0][0][0]
@@ -90,12 +91,61 @@ class Drawer(Canvas):
                 yMax = max(dot[1], yMax)
                 yMin = min(dot[1], yMin)
 
-        inFigure: bool = False
+        self.clear()
+
+        # Расставить флаги
         for figure in figureList:
-            for dot in figure:
-                xMax = max(dot[0], xMax)
-                xMin = min(dot[0], xMin)
-                yMax = max(dot[1], yMax)
-                yMin = min(dot[1], yMin)
+            for i in range(-1, len(figure) - 1):
+                dot1: Tuple[int, int] = figure[i]
+                dot2: Tuple[int, int] = figure[i + 1]
+                print(f"\n\n\nПрямая - {dot1, dot2}")
 
+                dx: int = dot2[0] - dot1[0]
+                dy: int = dot2[1] - dot1[1]
+                bx: float = dx / abs(dy)
+                by = dy / abs(dy)
 
+                print(f"dx = {dx}\ndy = {dy}\nbx = {bx}\nby = {by}\n\n")
+
+                xCur: float = dot1[0] + bx / 2
+                yCur: float = dot1[1] + by / 2
+
+                print(f"xCur = {xCur}\nyCur = {yCur}\n\n")
+
+                def centerOfCurrentPixel():
+                    return math.trunc(xCur) + 0.5, math.trunc(yCur) + 0.5
+
+                def currentPixel():
+                    return math.trunc(xCur), math.trunc(yCur)
+
+                for _ in range(abs(dy)):
+                    xCenterOfPixel, yCenterOfPixel = centerOfCurrentPixel()
+                    xPixel, yPixel = currentPixel()
+                    print(f"Рассматриваю пиксель {xPixel, yPixel}")
+                    print(f"Центр пикселя - {xCenterOfPixel, yCenterOfPixel}")
+                    print(f"Прямая {dot1, dot2} пересекает y = {yCenterOfPixel} в точке ({xCur, yCur})")
+                    if xCenterOfPixel < xCur:
+                        print(f"\tЭто правее центра пикселя, флаг - ({xPixel + 1, yPixel})")
+                        self.img.put(uniqueColor, (xPixel + 1, yPixel))
+                    else:
+                        print(f"\tЭто левее центра пикселя, флаг - ({xPixel, yPixel})")
+                        self.img.put(uniqueColor, (xPixel, yPixel))
+                    xCur += bx
+                    yCur += by
+                    print("_____________________________")
+
+        # Закрасить все, что надо закрасить
+        print(xMin, yMin, xMax, yMax)
+        curColor = bgColor
+        for y in range(yMin, yMax + 1):
+            for x in range(xMin, xMax + 1):
+                pixelColor = self.getColorOfPixel(x,y)
+                if (pixelColor != "#000"):
+                    print(pixelColor, end=" ")
+                if pixelColor == uniqueColor:
+                    print("Смена цвета")
+                    curColor = bgColor if curColor == fillColor else fillColor
+
+                self.img.put(curColor, (x, y))
+
+        self.redraw()

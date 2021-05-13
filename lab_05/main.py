@@ -72,6 +72,9 @@ class App:
         self.fillButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
         self.clearButton = Button(self.drawCurveFrame, text="Очистить", command=self.clear)
         self.clearButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
+        self.startButton = Button(self.drawCurveFrame, text="Заполнить",
+                                  command=lambda: self.canvas.fillFigure(self.figureList, fillColor=self.getCurveColor()))
+        self.startButton.place(relx=0.5, rely=0.60, relwidth=0.3, relheight=0.15)
 
     def initGUI(self):
         self.plotFrame = Frame(self.window)
@@ -111,7 +114,6 @@ class App:
             except ValueError:
                 showerror("Ошибка!", "Некорректный X")
                 return
-
 
         self.figureList[self.cur].append((_x, _y))
         self.canvas.img.put(self.getCurveColor(), (_x, _y))
