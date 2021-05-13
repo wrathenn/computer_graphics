@@ -71,7 +71,7 @@ class Drawer(Canvas):
 
     def getColorOfPixel(self, x: int, y: int) -> str:
         colorTuple = self.img.get(x, y)
-        color = "#" + f"{colorTuple[0]:X}" + f"{colorTuple[1]:X}" + f"{colorTuple[2]:X}"
+        color = "#" + f"{colorTuple[0]:02X}" + f"{colorTuple[1]:02X}" + f"{colorTuple[2]:02X}"
         return color
 
     def fillFigure(self, figureList: List[List[Tuple[int, int]]], fillColor="#F0F0F0", isDelayed: bool = False) -> None:
@@ -136,14 +136,14 @@ class Drawer(Canvas):
 
         # Закрасить все, что надо закрасить
         print(xMin, yMin, xMax, yMax)
-        curColor = bgColor
         for y in range(yMin, yMax + 1):
+            curColor = bgColor
             for x in range(xMin, xMax + 1):
                 pixelColor = self.getColorOfPixel(x,y)
-                if (pixelColor != "#000"):
-                    print(pixelColor, end=" ")
+                # if (pixelColor != "#000"):
+                    # print(pixelColor, end=" ")
                 if pixelColor == uniqueColor:
-                    print("Смена цвета")
+                    # print("Смена цвета")
                     curColor = bgColor if curColor == fillColor else fillColor
 
                 self.img.put(curColor, (x, y))
