@@ -4,7 +4,6 @@ from tkinter.ttk import Combobox, Style
 from tkinter.messagebox import showerror
 from drawer import Drawer
 from draw_backend import *
-from efficiency import *
 from typing import List, Tuple
 
 
@@ -63,18 +62,18 @@ class App:
 
         self.dotButton = Button(self.drawCurveFrame, text="Добавить точку", bg="green", command=self.figureDotAdd)
         self.dotButton.place(relx=0.02, rely=0.42, relwidth=0.3, relheight=0.12)
-        self.stopButton = Button(self.drawCurveFrame, text="Отменить фигуру", bg="orange", command=self.FigureStopInput)
+        self.stopButton = Button(self.drawCurveFrame, text="Отменить фигуру", bg="orange", command=self.figureStopInput)
         self.stopButton.place(relx=0.35, rely=0.42, relwidth=0.3, relheight=0.12)
         self.endButton = Button(self.drawCurveFrame, text="Готово", bg="yellow", command=self.figureEndInput)
         self.endButton.place(relx=0.68, rely=0.42, relwidth=0.3, relheight=0.12)
 
-        self.fillButton = Button(self.drawCurveFrame, text="Закрасить")
-        self.fillButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
-        self.clearButton = Button(self.drawCurveFrame, text="Очистить", command=self.clear)
-        self.clearButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
-        self.startButton = Button(self.drawCurveFrame, text="Заполнить",
-                                  command=lambda: self.canvas.fillFigure(self.figureList, fillColor=self.getCurveColor()))
-        self.startButton.place(relx=0.5, rely=0.60, relwidth=0.3, relheight=0.15)
+        self.clearButton = Button(self.drawCurveFrame, text="Очистить", bg="red", command=self.clear)
+        self.clearButton.place(relx=0.02, rely=0.60, relwidth=0.3, relheight=0.12)
+        self.startButton = Button(self.drawCurveFrame, text="Заполнить", bg="green",
+                                  command=lambda: self.canvas.fillFigure(self.figureList,
+                                                                         fillColor=self.getCurveColor(),
+                                                                         isDelayed=self.delayBool.get()))
+        self.startButton.place(relx=0.68, rely=0.60, relwidth=0.3, relheight=0.12)
 
     def initGUI(self):
         self.plotFrame = Frame(self.window)
@@ -97,9 +96,12 @@ class App:
 
         self.canvas.bind("<Button-1>", lambda event: self.figureDotAdd(event))
         self.canvas.bind("<Button-3>", lambda event: self.figureEndInput())
-        self.canvas.bind("<Button-2>", lambda event: self.FigureStopInput())
+        self.canvas.bind("<Button-2>", lambda event: self.figureStopInput())
+        self.canvas.bind("<Control-Button-1>", lambda event: self.figureDotAdd(event, mode=1))
+        self.canvas.bind("<Shift-Button-1>", lambda event: self.figureDotAdd(event, mode=2))
 
-    def figureDotAdd(self, event=0):
+    # mode = 1 => horizontal(ctrl), mode = 2 => vertical(shift)
+    def figureDotAdd(self, event=0, mode=0):
         if event:
             _x = event.x
             _y = event.y
@@ -115,10 +117,17 @@ class App:
                 showerror("Ошибка!", "Некорректный X")
                 return
 
+        tmpLen: int = len(self.figureList[self.cur])
+        if tmpLen != 0:
+            if mode == 1:
+                _y = self.figureList[self.cur][tmpLen - 1][1]
+            elif mode == 2:
+                _x = self.figureList[self.cur][tmpLen - 1][0]
+
         self.figureList[self.cur].append((_x, _y))
         self.canvas.img.put(self.getCurveColor(), (_x, _y))
 
-        tmpLen: int = len(self.figureList[self.cur])
+        tmpLen = len(self.figureList[self.cur])
         if tmpLen > 1:
             self.canvas.imgDrawLine(self.figureList[self.cur][tmpLen - 2][0],
                                     self.figureList[self.cur][tmpLen - 2][1],
@@ -144,7 +153,7 @@ class App:
         self.figureList.append([])
         self.canvas.redraw()
 
-    def FigureStopInput(self):
+    def figureStopInput(self):
         self.figureList.pop()
 
         def redrawFigures():
