@@ -11,7 +11,7 @@ class App:
     def __init__(self):
         self.window = Tk()
         self.window.geometry("1920x1080")
-        self.window.title("Лабораторная работа №3: алгоритмы построения отрезков")
+        self.window.title("Лабораторная работа №5 - список ребер и флаг")
         self.window.attributes("-zoomed", True)
 
         style = Style()  # If you dont have a class, put your root in the()

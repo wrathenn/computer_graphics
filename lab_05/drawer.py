@@ -6,7 +6,6 @@ import time
 
 from draw_backend import ddaSegment
 
-
 class Drawer(Canvas):
     def __init__(self, master, bg):
         super().__init__(master, bg=bg)
@@ -112,8 +111,8 @@ class Drawer(Canvas):
 
                 dx: int = dot2[0] - dot1[0]
                 dy: int = dot2[1] - dot1[1]
-                bx: float = dx / abs(dy)
-                by = dy / abs(dy)
+                bx: float = dx / abs(dy) if dy != 0 else dx
+                by = dy / abs(dy) if dy != 0 else dy
 
                 # print(f"dx = {dx}\ndy = {dy}\nbx = {bx}\nby = {by}\n\n")
 
