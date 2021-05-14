@@ -11,7 +11,7 @@ class App:
     def __init__(self):
         self.window = Tk()
         self.window.geometry("1920x1080")
-        self.window.title("Лабораторная работа №5 - список ребер и флаг")
+        self.window.title("Лабораторная работа №6 - построчный алгоритм заполнения с затравкой")
         self.window.attributes("-zoomed", True)
 
         style = Style()  # If you dont have a class, put your root in the()
@@ -27,12 +27,28 @@ class App:
         self.drawCurveFrame.place(relx=0, rely=0, relwidth=1, relheight=0.5)
 
         self.colors = {
-            "Черный": "#000000",
+            "Черный": "#000001",
             "Белый": "#FFFFFF",
             "Красный": "#FF0000",
             "Зеленый": "#00FF00",
             "Синий": "#0000FF"
         }
+
+        self.drawBorderColorLabel = Label(self.drawCurveFrame, text="Границы:")
+        self.drawBorderColorLabel.place(relx=0.05, rely=0.01, relwidth=0.2)
+        self.drawBorderColorComboBox = Combobox(
+            self.drawCurveFrame,
+            values=list(self.colors.keys()),
+            state="readonly"
+        )
+        self.drawBorderColorComboBox.bind("<<ComboboxSelected>>", lambda event: self.changeBorderColor())
+        self.drawBorderColorComboBox.current(0)
+        self.drawBorderColorComboBox.place(relx=0.30, rely=0.01, relwidth=0.3)
+        self.colorOfBorder = Label(self.drawCurveFrame, bg="black")
+        self.colorOfBorder.place(relx=0.65, rely=0.01, relwidth=0.3)
+
+        self.drawCurveColorLabel = Label(self.drawCurveFrame, text="Заполнение:")
+        self.drawCurveColorLabel.place(relx=0.05, rely=0.07, relwidth=0.2)
         self.drawCurveColorComboBox = Combobox(
             self.drawCurveFrame,
             values=list(self.colors.keys()),
@@ -40,9 +56,9 @@ class App:
         )
         self.drawCurveColorComboBox.bind("<<ComboboxSelected>>", lambda evt: self.changeCurveColor())
         self.drawCurveColorComboBox.current(0)
-        self.drawCurveColorComboBox.place(relx=0.05, rely=0.07, relwidth=0.5)
+        self.drawCurveColorComboBox.place(relx=0.30, rely=0.07, relwidth=0.3)
         self.colorOfCurve = Label(self.drawCurveFrame, bg="black")
-        self.colorOfCurve.place(relx=0.60, rely=0.07, relwidth=0.3)
+        self.colorOfCurve.place(relx=0.65, rely=0.07, relwidth=0.3)
 
         self.delayBool = BooleanVar()
         self.delayCheckButton = Checkbutton(self.drawCurveFrame, text="Включить задержку", variable=self.delayBool,
@@ -69,11 +85,21 @@ class App:
 
         self.clearButton = Button(self.drawCurveFrame, text="Очистить", bg="red", command=self.clear)
         self.clearButton.place(relx=0.02, rely=0.60, relwidth=0.3, relheight=0.12)
-        self.startButton = Button(self.drawCurveFrame, text="Заполнить", bg="green",
-                                  command=lambda: self.canvas.fillFigure(self.figureList,
-                                                                         fillColor=self.getCurveColor(),
-                                                                         isDelayed=self.delayBool.get()))
-        self.startButton.place(relx=0.68, rely=0.60, relwidth=0.3, relheight=0.12)
+
+        self.manualFrame = LabelFrame(self.drawParamsFrame, text="Управление")
+        self.manualFrame.place(relx=0, rely=0.55, relwidth=1, relheight=0.4)
+        self.manualLKMLabel = Label(self.manualFrame, text="ЛКМ - добавление новой точки")
+        self.manualCtrlLKMLabel = Label(self.manualFrame, text="crtl + ЛКМ - добавление новой точки (по горизонтали)")
+        self.manualShiftLKMLabel = Label(self.manualFrame, text="crtl + ЛКМ - добавление новой точки (по вертикали)")
+        self.manualPKMLabel = Label(self.manualFrame, text="ПКМ - замкнуть фигуру")
+        self.manualWheelLabel = Label(self.manualFrame, text="Колесико мыши - прервать построение фигуры")
+        self.manualShiftPKMLabel = Label(self.manualFrame, text="shift + ПКМ - выполнить заливку в выбранной точке")
+        self.manualLKMLabel.place(rely=0.05, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualCtrlLKMLabel.place(rely=0.15, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualShiftLKMLabel.place(rely=0.25, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualPKMLabel.place(rely=0.35, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualWheelLabel.place(rely=0.45, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualShiftPKMLabel.place(rely=0.55, relx=0.05, relwidth=0.9, relheight=0.07)
 
     def initGUI(self):
         self.plotFrame = Frame(self.window)
@@ -99,6 +125,12 @@ class App:
         self.canvas.bind("<Button-2>", lambda event: self.figureStopInput())
         self.canvas.bind("<Control-Button-1>", lambda event: self.figureDotAdd(event, mode=1))
         self.canvas.bind("<Shift-Button-1>", lambda event: self.figureDotAdd(event, mode=2))
+        self.canvas.bind("<Shift-Button-3>",
+                         lambda event: self.canvas.fillFigure(event.x, event.y,
+                                                              self.canvas.findMaxesMins(self.figureList),
+                                                              fillColor=self.getCurveColor(),
+                                                              borderColor=self.getBorderColor(),
+                                                              isDelayed=self.delayBool.get()))
 
     # mode = 1 => horizontal(ctrl), mode = 2 => vertical(shift)
     def figureDotAdd(self, event=0, mode=0):
@@ -125,7 +157,7 @@ class App:
                 _x = self.figureList[self.cur][tmpLen - 1][0]
 
         self.figureList[self.cur].append((_x, _y))
-        self.canvas.img.put(self.getCurveColor(), (_x, _y))
+        self.canvas.img.put(self.getBorderColor(), (_x, _y))
 
         tmpLen = len(self.figureList[self.cur])
         if tmpLen > 1:
@@ -133,7 +165,7 @@ class App:
                                     self.figureList[self.cur][tmpLen - 2][1],
                                     self.figureList[self.cur][tmpLen - 1][0],
                                     self.figureList[self.cur][tmpLen - 1][1],
-                                    self.getCurveColor())
+                                    self.getBorderColor())
 
         self.canvas.redraw()
 
@@ -147,7 +179,7 @@ class App:
                                 self.figureList[self.cur][0][1],
                                 self.figureList[self.cur][tmpLen - 1][0],
                                 self.figureList[self.cur][tmpLen - 1][1],
-                                self.getCurveColor())
+                                self.getBorderColor())
 
         self.cur += 1
         self.figureList.append([])
@@ -165,12 +197,12 @@ class App:
                                             figure[i][1],
                                             figure[i + 1][0],
                                             figure[i + 1][1],
-                                            self.getCurveColor())
+                                            self.getBorderColor())
                 self.canvas.imgDrawLine(figure[0][0],
                                         figure[0][1],
                                         figure[len(figure) - 1][0],
                                         figure[len(figure) - 1][1],
-                                        self.getCurveColor())
+                                        self.getBorderColor())
 
         redrawFigures()
         self.figureList.append([])
@@ -191,11 +223,20 @@ class App:
             return
         self.colorOfCurve.configure(bg=self.colors[color])
 
+    def changeBorderColor(self):
+        color = self.drawBorderColorComboBox.get()
+        if not color:
+            return
+        self.colorOfBorder.configure(bg=self.colors[color])
+
     def getCanvasSize(self):
         return self.canvas.winfo_width(), self.canvas.winfo_height()
 
     def getCurveColor(self):
         return self.colors[self.drawCurveColorComboBox.get()]
+
+    def getBorderColor(self):
+        return self.colors[self.drawBorderColorComboBox.get()]
 
 
 app = App()

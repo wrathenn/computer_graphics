@@ -6,6 +6,7 @@ import time
 
 from draw_backend import ddaSegment
 
+
 class Drawer(Canvas):
     def __init__(self, master, bg):
         super().__init__(master, bg=bg)
@@ -91,86 +92,73 @@ class Drawer(Canvas):
 
         return xMin, xMax, yMin, yMax
 
-    def fillFigure(self, figureList: List[List[Tuple[int, int]]], fillColor="#F0F0F0", isDelayed: bool = False) -> None:
-        uniqueColor = "#123456"
-        bgColor = "#FFFFFF"
+    def fillFigure(self, x: int, y: int, maxes: Tuple[int, int, int, int],
+                   fillColor="#F0F0F0", borderColor="#000000", isDelayed: bool = False) -> None:
+        xMin, xMax, yMin, yMax = maxes
+        xMin = x if x < xMin else xMin
+        xMax = x if x > xMax else xMax
+        yMin = y if y < yMin else yMin
+        yMax = y if y > xMax else yMax
 
-        # Найти максимумы
-        xMin, xMax, yMin, yMax = self.findMaxesMins(figureList)
-        timeStart, timeEnd = 0, 0
+        timeEnd: float
+        timeStart: float
+
+        stack = [(x, y)]
 
         if not isDelayed:
             timeStart = time.time()
 
-        # Расставить флаги
-        for figure in figureList:
-            for i in range(-1, len(figure) - 1):
-                dot1: Tuple[int, int] = figure[i]
-                dot2: Tuple[int, int] = figure[i + 1]
-                # print(f"\n\n\nПрямая - {dot1, dot2}")
+        def _fillRight(_x, _y):
+            _xr: int = _x
+            for _xr in range(_x, xMax):
+                _clr = self.getColorOfPixel(_xr, _y)
+                if _clr == borderColor or _clr == fillColor:
+                    return _xr - 1
+                self.img.put(fillColor, (_xr, _y))
 
-                dx: int = dot2[0] - dot1[0]
-                dy: int = dot2[1] - dot1[1]
-                bx: float = dx / abs(dy) if dy != 0 else dx
-                by = dy / abs(dy) if dy != 0 else dy
+            return _xr
 
-                # print(f"dx = {dx}\ndy = {dy}\nbx = {bx}\nby = {by}\n\n")
+        def _fillLeft(_x, _y):
+            _xl: int = _x
+            for _xl in range(_x, xMin, -1):
+                _clr = self.getColorOfPixel(_xl, _y)
+                if _clr == borderColor or _clr == fillColor:
+                    return _xl + 1
+                self.img.put(fillColor, (_xl, _y))
 
-                xCur: float = dot1[0] + bx / 2
-                yCur: float = dot1[1] + by / 2
+            return _xl
 
-                # print(f"xCur = {xCur}\nyCur = {yCur}\n\n")
+        def _findNewDots(_x, _y, _xl, _xr):
+            _intervalFlag = False
+            _xCur = _xl
+            while _xCur <= _xr:
+                while self.getColorOfPixel(_xCur, _y) != borderColor and self.getColorOfPixel(_xCur,
+                                                                                              _y) != fillColor and _xCur <= _xr:
+                    if not _intervalFlag:
+                        _intervalFlag = True
+                    _xCur += 1
 
-                def centerOfCurrentPixel():
-                    return math.trunc(xCur) + 0.5, math.trunc(yCur) + 0.5
+                if _intervalFlag:
+                    stack.append((_xCur - 1, _y))
+                    _intervalFlag = False
 
-                def currentPixel():
-                    return math.trunc(xCur), math.trunc(yCur)
+                _xTemp = _xCur
+                while not self.getColorOfPixel(_xCur, _y) in (borderColor, fillColor) and _xCur <= _xr:
+                    _xCur += 1
+                if _xCur == _xTemp:
+                    _xCur += 1
 
-                for _ in range(abs(dy)):
-                    xCenterOfPixel, yCenterOfPixel = centerOfCurrentPixel()
-                    xPixel, yPixel = currentPixel()
-                    # print(f"Рассматриваю пиксель {xPixel, yPixel}")
-                    # print(f"Центр пикселя - {xCenterOfPixel, yCenterOfPixel}")
-                    # print(f"Прямая {dot1, dot2} пересекает y = {yCenterOfPixel} в точке ({xCur, yCur})")
-                    if xCenterOfPixel < xCur:
-                        if self.getColorOfPixel(xPixel + 1, yPixel) == uniqueColor:
-                            self.img.put(bgColor, (xPixel + 1, yPixel))
-                        else:
-                            # print(f"\tЭто правее центра пикселя, флаг - ({xPixel + 1, yPixel})")
-                            self.img.put(uniqueColor, (xPixel + 1, yPixel))
-                    else:
-                        if self.getColorOfPixel(xPixel, yPixel) == uniqueColor:
-                            self.img.put(bgColor, (xPixel, yPixel))
-                        else:
-                            # print(f"\tЭто левее центра пикселя, флаг - ({xPixel, yPixel})")
-                            self.img.put(uniqueColor, (xPixel, yPixel))
-                    xCur += bx
-                    yCur += by
-                    # print("_____________________________")
-                if isDelayed:
-                    self.redraw()
-                    self.update()
-                    time.sleep(0.5)
-
-        # Закрасить все, что надо закрасить
-        # print(xMin, yMin, xMax, yMax)
-        for y in range(yMin, yMax + 1):
-            curColor = bgColor
-            for x in range(xMin, xMax + 1):
-                pixelColor = self.getColorOfPixel(x, y)
-                # if (pixelColor != "#000"):
-                # print(pixelColor, end=" ")
-                if pixelColor == uniqueColor:
-                    # print("Смена цвета")
-                    curColor = bgColor if curColor == fillColor else fillColor
-
-                self.img.put(curColor, (x, y))
+        while stack:
+            x, y = stack.pop()
+            self.img.put(fillColor, (x, y))
+            xl, xr = _fillLeft(x - 1, y), _fillRight(x + 1, y)
+            _findNewDots(x, y + 1, xl, xr)
+            _findNewDots(x, y - 1, xl, xr)
 
             if isDelayed:
                 self.redraw()
                 self.update()
-                time.sleep(0.025)
+                time.sleep(0.0025)
 
         self.redraw()
 
