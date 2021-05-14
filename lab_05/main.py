@@ -75,6 +75,19 @@ class App:
                                                                          isDelayed=self.delayBool.get()))
         self.startButton.place(relx=0.68, rely=0.60, relwidth=0.3, relheight=0.12)
 
+        self.manualFrame = LabelFrame(self.drawParamsFrame, text="Управление")
+        self.manualFrame.place(relx=0, rely=0.55, relwidth=1, relheight=0.4)
+        self.manualLKMLabel = Label(self.manualFrame, text="ЛКМ - добавление новой точки")
+        self.manualCtrlLKMLabel = Label(self.manualFrame, text="crtl + ЛКМ - добавление новой точки (по горизонтали)")
+        self.manualShiftLKMLabel = Label(self.manualFrame, text="crtl + ЛКМ - добавление новой точки (по вертикали)")
+        self.manualPKMLabel = Label(self.manualFrame, text="ПКМ - замкнуть фигуру")
+        self.manualWheelLabel = Label(self.manualFrame, text="Колесико мыши - прервать построение фигуры")
+        self.manualLKMLabel.place(rely=0.05, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualCtrlLKMLabel.place(rely=0.15, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualShiftLKMLabel.place(rely=0.25, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualPKMLabel.place(rely=0.35, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualWheelLabel.place(rely=0.45, relx=0.05, relwidth=0.9, relheight=0.07)
+
     def initGUI(self):
         self.plotFrame = Frame(self.window)
         self.canvas = Drawer(self.plotFrame, bg="white")
