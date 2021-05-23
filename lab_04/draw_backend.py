@@ -42,7 +42,7 @@ def drawCircleBresenham(xCenter, yCenter, radius):
     delta = 2 * (1 - radius)
 
     while x < y:
-        if delta < 0:
+        if delta <= 0:
             d1 = 2 * (delta + y) - 1
             x += 1
             if d1 >= 0:
@@ -50,10 +50,7 @@ def drawCircleBresenham(xCenter, yCenter, radius):
                 delta += 2 * (x - y + 1)
             else:
                 delta += x + x + 1
-        elif delta == 0:
-            x += 1
-            y -= 1
-            delta += 2 * (x - y + 1)
+
         else:
             d2 = 2 * (delta - x) - 1
             y -= 1
@@ -62,6 +59,7 @@ def drawCircleBresenham(xCenter, yCenter, radius):
                 delta += 2 * (x - y + 1)
             else:
                 delta -= 2 * y - 1
+
         result.append((x + xCenter, y + yCenter))
 
     return _circleMultiply(result, xCenter, yCenter)

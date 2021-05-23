@@ -67,31 +67,28 @@ def compareCircleTime():
         testMiddle(xStart, yStart, r)
         testLib(xStart, yStart, r)
 
-    barWidth = 0.4 / 3
-    x1 = np.arange(1, 7) - barWidth * 3
-    x2 = np.arange(1, 7) - barWidth * 2
-    x3 = np.arange(1, 7) - barWidth
-    x4 = np.arange(1, 7)
-    x5 = np.arange(1, 7) + barWidth
+    x = [0, 1, 2, 3, 4, 5]
     y1 = normalStore
     y2 = parameterStore
     y3 = bresStore
     y4 = middleStore
     y5 = libStore
 
-    fig, ax = plt.subplots()
+    figure = plt.figure()
+    ax = figure.add_subplot(111)
     ax.set_title(f"Сравнение времени на окружностях радиуса {rList} (в с * {modifier})")
-    ax.bar(x1, y1, width=barWidth, label="Каноническое уравнение")
-    ax.bar(x2, y2, width=barWidth, label="Параметрическое уравнение")
-    ax.bar(x3, y3, width=barWidth, label="Алгоритм Брезенхема")
-    ax.bar(x4, y4, width=barWidth, label="Алгоритм средней точки")
-    ax.bar(x5, y5, width=barWidth, label="Библиотечная функция")
+
+    ax.plot(x, y1, c='blue', label="Каноническое уравнение")
+    ax.plot(x, y2, c='orange', label="Параметрическое уравнение")
+    ax.plot(x, y3, c='green', label="Алгоритм Брезенхема")
+    ax.plot(x, y4, c='red', label="Алгоритм средней точки")
+    ax.plot(x, y5, c='purple', label="Библиотечная функция")
 
     ax.legend()
     ax.set_facecolor('seashell')
-    fig.set_figwidth(12)  # ширина Figure
-    fig.set_figheight(6)  # высота Figure
-    fig.set_facecolor('floralwhite')
+    # fig.set_figwidth(12)  # ширина Figure
+    # fig.set_figheight(6)  # высота Figure
+    # fig.set_facecolor('floralwhite')
 
     print(f"Каноническое уравнение", normalStore)
     print(f"Параметрическое уравнение", parameterStore)
@@ -159,31 +156,24 @@ def compareEllipseTime():
         testMiddle(xStart, yStart, rW, rH)
         testLib(xStart, yStart, rW, rH)
 
-    barWidth = 0.4 / 3
-    x1 = np.arange(1, 7) - barWidth * 3
-    x2 = np.arange(1, 7) - barWidth * 2
-    x3 = np.arange(1, 7) - barWidth
-    x4 = np.arange(1, 7)
-    x5 = np.arange(1, 7) + barWidth
+    x = [0, 1, 2, 3, 4, 5]
     y1 = normalStore
     y2 = parameterStore
     y3 = bresStore
     y4 = middleStore
     y5 = libStore
 
-    fig, ax = plt.subplots()
+    figure = plt.figure()
+    ax = figure.add_subplot(111)
     ax.set_title(f"Сравнение времени на эллипсах радиусами {rwList}, {rhList} (в с * {modifier})")
-    ax.bar(x1, y1, width=barWidth, label="Каноническое уравнение")
-    ax.bar(x2, y2, width=barWidth, label="Параметрическое уравнение")
-    ax.bar(x3, y3, width=barWidth, label="Алгоритм Брезенхема")
-    ax.bar(x4, y4, width=barWidth, label="Алгоритм средней точки")
-    ax.bar(x5, y5, width=barWidth, label="Библиотечная функция")
+    ax.plot(x, y1, c='blue', label="Каноническое уравнение")
+    ax.plot(x, y2, c='orange', label="Параметрическое уравнение")
+    ax.plot(x, y3, c='green', label="Алгоритм Брезенхема")
+    ax.plot(x, y4, c='red', label="Алгоритм средней точки")
+    ax.plot(x, y5, c='purple', label="Библиотечная функция")
 
     ax.legend()
     ax.set_facecolor('seashell')
-    fig.set_figwidth(12)  # ширина Figure
-    fig.set_figheight(6)  # высота Figure
-    fig.set_facecolor('floralwhite')
 
     print(f"Каноническое уравнение", normalStore)
     print(f"Параметрическое уравнение", parameterStore)

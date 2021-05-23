@@ -10,7 +10,7 @@ from efficiency import *
 class App:
     def __init__(self):
         self.window = Tk()
-        self.window.title("Лабораторная работа №3: алгоритмы построения отрезков")
+        self.window.title("Лабораторная работа №4 Шацкий Р.Е.")
         self.window.attributes("-zoomed", True)
 
         style = Style()  # If you dont have a class, put your root in the()
@@ -78,10 +78,12 @@ class App:
         self.drawCircleRLabel.place(relx=0.31, rely=0.05, relwidth=0.1, relheight=0.15)
         self.drawCircleREntry.place(relx=0.43, rely=0.05, relwidth=0.15, relheight=0.15)
 
-        self.drawCircleDrawButton = Button(self.drawCircleFrame, text="Построить", command=self.drawCircle)
+        self.drawCircleDrawButton = Button(self.drawCircleFrame, text="Построить", bg="green", fg="white",
+                                           command=self.drawCircle)
         self.drawCircleDrawButton.place(relx=0.02, rely=0.5, relwidth=0.4, relheight=0.4)
 
-        self.drawCircleClearButton = Button(self.drawCircleFrame, text="Очистить", command=self.canvas.clear)
+        self.drawCircleClearButton = Button(self.drawCircleFrame, text="Очистить", bg="orange",
+                                            command=self.canvas.clear)
         self.drawCircleClearButton.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4)
 
     def initGUIEllipse(self):
@@ -108,10 +110,12 @@ class App:
         self.drawEllipseRHLabel.place(relx=0.31, rely=0.22, relwidth=0.1, relheight=0.15)
         self.drawEllipseRHEntry.place(relx=0.43, rely=0.22, relwidth=0.15, relheight=0.15)
 
-        self.drawEllipseDrawButton = Button(self.drawEllipseFrame, text="Построить", command=self.drawEllipse)
+        self.drawEllipseDrawButton = Button(self.drawEllipseFrame, text="Построить", bg="green", fg="white",
+                                            command=self.drawEllipse)
         self.drawEllipseDrawButton.place(relx=0.02, rely=0.5, relwidth=0.4, relheight=0.4)
 
-        self.drawEllipseClearButton = Button(self.drawEllipseFrame, text="Очистить", command=self.canvas.clear)
+        self.drawEllipseClearButton = Button(self.drawEllipseFrame, text="Очистить", bg="orange",
+                                             command=self.canvas.clear)
         self.drawEllipseClearButton.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4)
 
     def initGUISpectrum(self):
@@ -176,11 +180,12 @@ class App:
         self.drawSpectrumCircleAmountLabel.place(relx=0.31, rely=0.22, relwidth=0.1, relheight=0.15)
         self.drawSpectrumCircleAmountEntry.place(relx=0.43, rely=0.22, relwidth=0.15, relheight=0.15)
 
-        self.drawSpectrumCircleButton = Button(self.drawSpectrumCircleFrame, text="Построить",
+        self.drawSpectrumCircleButton = Button(self.drawSpectrumCircleFrame, text="Построить", bg="green", fg="white",
                                                command=self.drawCircleSpectrum)
         self.drawSpectrumCircleButton.place(relx=0.02, rely=0.5, relwidth=0.4, relheight=0.4)
 
-        self.drawSpectrumCircleClearButton = Button(self.drawSpectrumCircleFrame, text="Очистить", command=self.canvas.clear)
+        self.drawSpectrumCircleClearButton = Button(self.drawSpectrumCircleFrame, text="Очистить", bg="orange",
+                                                    command=self.canvas.clear)
         self.drawSpectrumCircleClearButton.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4)
 
     def initGUISpectrumEllipse(self):
@@ -197,11 +202,6 @@ class App:
         self.drawSpectrumEllipseRWmaxLabel.place(relx=0.02, rely=0.22, relwidth=0.11, relheight=0.15)
         self.drawSpectrumEllipseRWmaxEntry.place(relx=0.14, rely=0.22, relwidth=0.15, relheight=0.15)
 
-        self.drawSpectrumEllipseRHminLabel = Label(self.drawSpectrumEllipseFrame, text="R | мин.:")
-        self.drawSpectrumEllipseRHminEntry = Entry(self.drawSpectrumEllipseFrame)
-        self.drawSpectrumEllipseRHminLabel.place(relx=0.31, rely=0.05, relwidth=0.11, relheight=0.15)
-        self.drawSpectrumEllipseRHminEntry.place(relx=0.43, rely=0.05, relwidth=0.15, relheight=0.15)
-
         self.drawSpectrumEllipseRHmaxLabel = Label(self.drawSpectrumEllipseFrame, text="R | макс.:")
         self.drawSpectrumEllipseRHmaxEntry = Entry(self.drawSpectrumEllipseFrame)
         self.drawSpectrumEllipseRHmaxLabel.place(relx=0.31, rely=0.22, relwidth=0.11, relheight=0.15)
@@ -212,20 +212,22 @@ class App:
         self.drawSpectrumEllipseAmountLabel.place(relx=0.60, rely=0.05, relwidth=0.11, relheight=0.15)
         self.drawSpectrumEllipseAmountEntry.place(relx=0.72, rely=0.05, relwidth=0.15, relheight=0.15)
 
-        self.drawSpectrumEllipseButton = Button(self.drawSpectrumEllipseFrame, text="Построить",
+        self.drawSpectrumEllipseButton = Button(self.drawSpectrumEllipseFrame, text="Построить", bg="green", fg="white",
                                                 command=self.drawEllipseSpectrum)
         self.drawSpectrumEllipseButton.place(relx=0.02, rely=0.5, relwidth=0.4, relheight=0.4)
 
-        self.drawSpectrumEllipseClearButton = Button(self.drawSpectrumEllipseFrame, text="Очистить", command=self.canvas.clear)
+        self.drawSpectrumEllipseClearButton = Button(self.drawSpectrumEllipseFrame, text="Очистить", bg="orange",
+                                                     command=self.canvas.clear)
         self.drawSpectrumEllipseClearButton.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.4)
 
     def initGUIEfficiency(self):
         self.effFrame = LabelFrame(self.window, text="Эффективность по времени")
         self.effFrame.place(relx=0, rely=0.875, relwidth=0.3, relheight=0.125)
 
-        self.effCircleButton = Button(self.effFrame, text="Окружности", command=compareCircleTime)
+        self.effCircleButton = Button(self.effFrame, text="Окружности", bg="green", fg="white",
+                                      command=compareCircleTime)
         self.effCircleButton.place(relx=0.1, rely=0.1, relwidth=0.3, relheight=0.8)
-        self.effCircleButton = Button(self.effFrame, text="Эллипсы", command=compareEllipseTime)
+        self.effCircleButton = Button(self.effFrame, text="Эллипсы", bg="green", fg="white", command=compareEllipseTime)
         self.effCircleButton.place(relx=0.6, rely=0.1, relwidth=0.3, relheight=0.8)
 
     def initGUI(self):
@@ -408,7 +410,6 @@ class App:
             for radius in range(rMin, rMax, step):
                 self.canvas.drawLine(methodFunction(xCenter, yCenter, radius), color)
 
-
     def drawEllipseSpectrum(self):
         xCenter, yCenter = self.getCanvasSize()
         xCenter = round(xCenter / 2)
@@ -434,13 +435,6 @@ class App:
             showerror("Ошибка!", "Некорректный максимальный радиус по горизонтали")
             return
         try:
-            rhMin = int(self.drawSpectrumEllipseRHminEntry.get())
-            if rhMin <= 0:
-                raise ValueError
-        except ValueError:
-            showerror("Ошибка!", "Некорректный минимальный радиус по вертикали")
-            return
-        try:
             rhMax = int(self.drawSpectrumEllipseRHmaxEntry.get())
             if rhMax <= 0:
                 raise ValueError
@@ -454,6 +448,8 @@ class App:
         except ValueError:
             showerror("Ошибка!", "Некорректное количество эллипсов")
             return
+
+        rhMin = round(rhMax * rwMin / rwMax)
 
         method = self.drawSpectrumAlgComboBox.get()
         color = self.getSpectrumColor()
