@@ -1,7 +1,3 @@
-import math
-
-import numpy
-
 def ddaSegment(xStart, yStart, xEnd, yEnd):
     if xStart == xEnd and yStart == yEnd:
         return [(xStart, yStart)]

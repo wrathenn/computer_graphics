@@ -4,7 +4,6 @@ from tkinter.ttk import Combobox, Style
 from tkinter.messagebox import showerror
 from drawer import Drawer
 from draw_backend import *
-from efficiency import *
 from typing import List, Tuple
 
 
@@ -12,7 +11,7 @@ class App:
     def __init__(self):
         self.window = Tk()
         self.window.geometry("1920x1080")
-        self.window.title("Лабораторная работа №3: алгоритмы построения отрезков")
+        self.window.title("Лабораторная работа №5 - список ребер и флаг")
         self.window.attributes("-zoomed", True)
 
         style = Style()  # If you dont have a class, put your root in the()
@@ -61,17 +60,33 @@ class App:
         self.yEntry = Entry(self.drawCurveFrame)
         self.yEntry.place(relx=0.42, rely=0.35, relwidth=0.2)
 
-        self.dotButton = Button(self.drawCurveFrame, text="Добавить точку", bg="green", command=self.dotFigure)
+        self.dotButton = Button(self.drawCurveFrame, text="Добавить точку", bg="green", command=self.figureDotAdd)
         self.dotButton.place(relx=0.02, rely=0.42, relwidth=0.3, relheight=0.12)
-        self.stopButton = Button(self.drawCurveFrame, text="Отменить фигуру", bg="orange", command=self.stopFigure)
+        self.stopButton = Button(self.drawCurveFrame, text="Отменить фигуру", bg="orange", command=self.figureStopInput)
         self.stopButton.place(relx=0.35, rely=0.42, relwidth=0.3, relheight=0.12)
-        self.endButton = Button(self.drawCurveFrame, text="Готово", bg="yellow", command=self.endFigure)
+        self.endButton = Button(self.drawCurveFrame, text="Готово", bg="yellow", command=self.figureEndInput)
         self.endButton.place(relx=0.68, rely=0.42, relwidth=0.3, relheight=0.12)
 
-        self.fillButton = Button(self.drawCurveFrame, text="Закрасить")
-        self.fillButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
-        self.clearButton = Button(self.drawCurveFrame, text="Очистить", command=self.clear)
-        self.clearButton.place(relx=0.05, rely=0.60, relwidth=0.3, relheight=0.15)
+        self.clearButton = Button(self.drawCurveFrame, text="Очистить", bg="red", command=self.clear)
+        self.clearButton.place(relx=0.02, rely=0.60, relwidth=0.3, relheight=0.12)
+        self.startButton = Button(self.drawCurveFrame, text="Заполнить", bg="green",
+                                  command=lambda: self.canvas.fillFigure(self.figureList,
+                                                                         fillColor=self.getCurveColor(),
+                                                                         isDelayed=self.delayBool.get()))
+        self.startButton.place(relx=0.68, rely=0.60, relwidth=0.3, relheight=0.12)
+
+        self.manualFrame = LabelFrame(self.drawParamsFrame, text="Управление")
+        self.manualFrame.place(relx=0, rely=0.55, relwidth=1, relheight=0.4)
+        self.manualLKMLabel = Label(self.manualFrame, text="ЛКМ - добавление новой точки")
+        self.manualCtrlLKMLabel = Label(self.manualFrame, text="ctrl + ЛКМ - добавление новой точки (по горизонтали)")
+        self.manualShiftLKMLabel = Label(self.manualFrame, text="ctrl + ЛКМ - добавление новой точки (по вертикали)")
+        self.manualPKMLabel = Label(self.manualFrame, text="ПКМ - замкнуть фигуру")
+        self.manualWheelLabel = Label(self.manualFrame, text="Колесико мыши - прервать построение фигуры")
+        self.manualLKMLabel.place(rely=0.05, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualCtrlLKMLabel.place(rely=0.15, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualShiftLKMLabel.place(rely=0.25, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualPKMLabel.place(rely=0.35, relx=0.05, relwidth=0.9, relheight=0.07)
+        self.manualWheelLabel.place(rely=0.45, relx=0.05, relwidth=0.9, relheight=0.07)
 
     def initGUI(self):
         self.plotFrame = Frame(self.window)
@@ -92,112 +107,89 @@ class App:
         self.figureList: List[List[Tuple[int, int]]] = [[]]
         self.cur: int = 0
 
-        def leftClick(event):
-            print("on canvas - ", (event.x, event.y))
-            self.figureList[self.cur].append((event.x, event.y))
-            # (event.x - self.canvas.offsetX, event.y - self.canvas.offsetY)
-            self.canvas.img.put(self.getCurveColor(), (event.x, event.y))
-            self.canvas.create_image((0,0), image=self.canvas.img, state="normal", anchor="nw")
-            # self.canvas.create_oval(event.x,
-            #                         event.y,
-            #                         event.x,
-            #                         event.y,
-            #                         width=2, outline=self.getCurveColor())
+        self.canvas.bind("<Button-1>", lambda event: self.figureDotAdd(event))
+        self.canvas.bind("<Button-3>", lambda event: self.figureEndInput())
+        self.canvas.bind("<Button-2>", lambda event: self.figureStopInput())
+        self.canvas.bind("<Control-Button-1>", lambda event: self.figureDotAdd(event, mode=1))
+        self.canvas.bind("<Shift-Button-1>", lambda event: self.figureDotAdd(event, mode=2))
 
-            tmpLen: int = len(self.figureList[self.cur])
-            if tmpLen > 1:
-                self.canvas.drawLine(ddaSegment(self.figureList[self.cur][tmpLen - 2][0] - self.canvas.offsetX,
-                                                self.figureList[self.cur][tmpLen - 2][1] - self.canvas.offsetY,
-                                                self.figureList[self.cur][tmpLen - 1][0] - self.canvas.offsetX,
-                                                self.figureList[self.cur][tmpLen - 1][1] - self.canvas.offsetY
-                                                ), self.getCurveColor())
-
-        def rightClick(event):
-            tmpLen: int = len(self.figureList[self.cur])
-            if tmpLen < 3:
-                showerror("Ошибка!", "Нужно отметить как минимум 3 точки")
+    # mode = 1 => horizontal(ctrl), mode = 2 => vertical(shift)
+    def figureDotAdd(self, event=0, mode=0):
+        if event:
+            _x = event.x
+            _y = event.y
+        else:
+            try:
+                _x = int(self.xEntry.get())
+            except ValueError:
+                showerror("Ошибка!", "Некорректный X")
+                return
+            try:
+                _y = int(self.yEntry.get())
+            except ValueError:
+                showerror("Ошибка!", "Некорректный X")
                 return
 
-            self.canvas.drawLine(ddaSegment(self.figureList[self.cur][0][0] - self.canvas.offsetX,
-                                            self.figureList[self.cur][0][1] - self.canvas.offsetY,
-                                            self.figureList[self.cur][tmpLen - 1][0] - self.canvas.offsetX,
-                                            self.figureList[self.cur][tmpLen - 1][1] - self.canvas.offsetY
-                                            ), self.getCurveColor())
-            self.cur += 1
-            self.figureList.append([])
-
-        def middleClick(event):
-            self.figureList.pop()
-            self.redrawFigures()
-            self.figureList.append([])
-
-        self.canvas.bind("<Button-1>", leftClick)
-        self.canvas.bind("<Button-3>", rightClick)
-        self.canvas.bind("<Button-2>", middleClick)
-
-    def redrawFigures(self):
-        self.canvas.clear()
-        figure: List[Tuple[int, int]]
-        for figure in self.figureList:
-            for i in range(len(figure) - 1):
-                self.canvas.drawLine(ddaSegment(figure[i][0] - self.canvas.offsetX,
-                                                figure[i][1] - self.canvas.offsetY,
-                                                figure[i + 1][0] - self.canvas.offsetX,
-                                                figure[i + 1][1] - self.canvas.offsetY
-                                                ), self.getCurveColor())
-            self.canvas.drawLine(ddaSegment(figure[0][0] - self.canvas.offsetX,
-                                            figure[0][1] - self.canvas.offsetY,
-                                            figure[len(figure) - 1][0] - self.canvas.offsetX,
-                                            figure[len(figure) - 1][1] - self.canvas.offsetY
-                                            ), self.getCurveColor())
-
-    def dotFigure(self):
-        try:
-            _x = int(self.xEntry.get()) + self.canvas.offsetX
-        except ValueError:
-            showerror("Ошибка!", "Некорректный X")
-            return
-        try:
-            _y = int(self.yEntry.get()) + self.canvas.offsetY
-        except ValueError:
-            showerror("Ошибка!", "Некорректный X")
-            return
+        tmpLen: int = len(self.figureList[self.cur])
+        if tmpLen != 0:
+            if mode == 1:
+                _y = self.figureList[self.cur][tmpLen - 1][1]
+            elif mode == 2:
+                _x = self.figureList[self.cur][tmpLen - 1][0]
 
         self.figureList[self.cur].append((_x, _y))
+        self.canvas.img.put(self.getCurveColor(), (_x, _y))
 
-        self.canvas.create_oval(_x, _y, _x, _y, width=2, outline=self.getCurveColor())
-
-        tmpLen: int = len(self.figureList[self.cur])
+        tmpLen = len(self.figureList[self.cur])
         if tmpLen > 1:
-            self.canvas.drawLine(ddaSegment(self.figureList[self.cur][tmpLen - 2][0] - self.canvas.offsetX,
-                                            self.figureList[self.cur][tmpLen - 2][1] - self.canvas.offsetY,
-                                            self.figureList[self.cur][tmpLen - 1][0] - self.canvas.offsetX,
-                                            self.figureList[self.cur][tmpLen - 1][1] - self.canvas.offsetY,
-                                            ), self.getCurveColor())
+            self.canvas.imgDrawLine(self.figureList[self.cur][tmpLen - 2][0],
+                                    self.figureList[self.cur][tmpLen - 2][1],
+                                    self.figureList[self.cur][tmpLen - 1][0],
+                                    self.figureList[self.cur][tmpLen - 1][1],
+                                    self.getCurveColor())
 
-    def endFigure(self):
+        self.canvas.redraw()
+
+    def figureEndInput(self):
         tmpLen: int = len(self.figureList[self.cur])
         if tmpLen < 3:
             showerror("Ошибка!", "Нужно отметить как минимум 3 точки")
             return
 
-        self.canvas.drawLine(ddaSegment(self.figureList[self.cur][0][0] - self.canvas.offsetX,
-                                        self.figureList[self.cur][0][1] - self.canvas.offsetY,
-                                        self.figureList[self.cur][tmpLen - 1][0] - self.canvas.offsetX,
-                                        self.figureList[self.cur][tmpLen - 1][1] - self.canvas.offsetY
-                                        ), self.getCurveColor())
+        self.canvas.imgDrawLine(self.figureList[self.cur][0][0],
+                                self.figureList[self.cur][0][1],
+                                self.figureList[self.cur][tmpLen - 1][0],
+                                self.figureList[self.cur][tmpLen - 1][1],
+                                self.getCurveColor())
+
         self.cur += 1
         self.figureList.append([])
+        self.canvas.redraw()
 
-    def stopFigure(self):
+    def figureStopInput(self):
         self.figureList.pop()
-        self.redrawFigures()
+
+        def redrawFigures():
+            self.canvas.clear()
+            figure: List[Tuple[int, int]]
+            for figure in self.figureList:
+                for i in range(len(figure) - 1):
+                    self.canvas.imgDrawLine(figure[i][0],
+                                            figure[i][1],
+                                            figure[i + 1][0],
+                                            figure[i + 1][1],
+                                            self.getCurveColor())
+                self.canvas.imgDrawLine(figure[0][0],
+                                        figure[0][1],
+                                        figure[len(figure) - 1][0],
+                                        figure[len(figure) - 1][1],
+                                        self.getCurveColor())
+
+        redrawFigures()
         self.figureList.append([])
+        self.canvas.redraw()
 
     def clear(self):
-        w, h = self.getCanvasSize()
-        print(w,h)
-
         self.figureList = [[]]
         self.cur = 0
         self.canvas.clear()
@@ -217,5 +209,6 @@ class App:
 
     def getCurveColor(self):
         return self.colors[self.drawCurveColorComboBox.get()]
+
 
 app = App()
