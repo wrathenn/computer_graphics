@@ -79,9 +79,9 @@ class App:
         self.manualFrame.place(relx=0, rely=0.55, relwidth=1, relheight=0.4)
         self.manualLKMLabel = Label(self.manualFrame, text="ЛКМ - добавление новой точки")
         self.manualCtrlLKMLabel = Label(self.manualFrame, text="ctrl + ЛКМ - добавление новой точки (по горизонтали)")
-        self.manualShiftLKMLabel = Label(self.manualFrame, text="ctrl + ЛКМ - добавление новой точки (по вертикали)")
+        self.manualShiftLKMLabel = Label(self.manualFrame, text="shift + ЛКМ - добавление новой точки (по вертикали)")
         self.manualPKMLabel = Label(self.manualFrame, text="ПКМ - замкнуть фигуру")
-        self.manualWheelLabel = Label(self.manualFrame, text="Колесико мыши - прервать построение фигуры")
+        self.manualWheelLabel = Label(self.manualFrame, text="Колесико мыши - прервать построение текущей фигуры")
         self.manualLKMLabel.place(rely=0.05, relx=0.05, relwidth=0.9, relheight=0.07)
         self.manualCtrlLKMLabel.place(rely=0.15, relx=0.05, relwidth=0.9, relheight=0.07)
         self.manualShiftLKMLabel.place(rely=0.25, relx=0.05, relwidth=0.9, relheight=0.07)
@@ -153,7 +153,7 @@ class App:
     def figureEndInput(self):
         tmpLen: int = len(self.figureList[self.cur])
         if tmpLen < 3:
-            showerror("Ошибка!", "Нужно отметить как минимум 3 точки")
+            showerror("Ошибка!", "Фигура должна состоять как минимум из 3 точек")
             return
 
         self.canvas.imgDrawLine(self.figureList[self.cur][0][0],
