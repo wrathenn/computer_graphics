@@ -199,18 +199,18 @@ class App:
 
         self.drawSpectrumEllipseRWmaxLabel = Label(self.drawSpectrumEllipseFrame, text="R_ макс.:")
         self.drawSpectrumEllipseRWmaxEntry = Entry(self.drawSpectrumEllipseFrame)
-        self.drawSpectrumEllipseRWmaxLabel.place(relx=0.02, rely=0.22, relwidth=0.11, relheight=0.15)
-        self.drawSpectrumEllipseRWmaxEntry.place(relx=0.14, rely=0.22, relwidth=0.15, relheight=0.15)
+        self.drawSpectrumEllipseRWmaxLabel.place(relx=0.31, rely=0.05, relwidth=0.11, relheight=0.15)
+        self.drawSpectrumEllipseRWmaxEntry.place(relx=0.43, rely=0.05, relwidth=0.15, relheight=0.15)
 
         self.drawSpectrumEllipseRHmaxLabel = Label(self.drawSpectrumEllipseFrame, text="R | макс.:")
         self.drawSpectrumEllipseRHmaxEntry = Entry(self.drawSpectrumEllipseFrame)
-        self.drawSpectrumEllipseRHmaxLabel.place(relx=0.31, rely=0.22, relwidth=0.11, relheight=0.15)
-        self.drawSpectrumEllipseRHmaxEntry.place(relx=0.43, rely=0.22, relwidth=0.15, relheight=0.15)
+        self.drawSpectrumEllipseRHmaxLabel.place(relx=0.60, rely=0.05, relwidth=0.11, relheight=0.15)
+        self.drawSpectrumEllipseRHmaxEntry.place(relx=0.72, rely=0.05, relwidth=0.15, relheight=0.15)
 
         self.drawSpectrumEllipseAmountLabel = Label(self.drawSpectrumEllipseFrame, text="Кол-во:")
         self.drawSpectrumEllipseAmountEntry = Entry(self.drawSpectrumEllipseFrame)
-        self.drawSpectrumEllipseAmountLabel.place(relx=0.60, rely=0.05, relwidth=0.11, relheight=0.15)
-        self.drawSpectrumEllipseAmountEntry.place(relx=0.72, rely=0.05, relwidth=0.15, relheight=0.15)
+        self.drawSpectrumEllipseAmountLabel.place(relx=0.31, rely=0.22, relwidth=0.11, relheight=0.15)
+        self.drawSpectrumEllipseAmountEntry.place(relx=0.43, rely=0.22, relwidth=0.15, relheight=0.15)
 
         self.drawSpectrumEllipseButton = Button(self.drawSpectrumEllipseFrame, text="Построить", bg="green", fg="white",
                                                 command=self.drawEllipseSpectrum)

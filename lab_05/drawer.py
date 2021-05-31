@@ -102,7 +102,7 @@ class Drawer(Canvas):
         if not isDelayed:
             timeStart = time.time()
 
-        # Расставить флаги
+        # Расставить пиксели у отрезков
         for figure in figureList:
             for i in range(-1, len(figure) - 1):
                 dot1: Tuple[int, int] = figure[i]
@@ -137,13 +137,13 @@ class Drawer(Canvas):
                         if self.getColorOfPixel(xPixel + 1, yPixel) == uniqueColor:
                             self.img.put(bgColor, (xPixel + 1, yPixel))
                         else:
-                            # print(f"\tЭто правее центра пикселя, флаг - ({xPixel + 1, yPixel})")
+                            # print(f"\tЭто правее центра пикселя, помечаю - ({xPixel + 1, yPixel})")
                             self.img.put(uniqueColor, (xPixel + 1, yPixel))
                     else:
                         if self.getColorOfPixel(xPixel, yPixel) == uniqueColor:
                             self.img.put(bgColor, (xPixel, yPixel))
                         else:
-                            # print(f"\tЭто левее центра пикселя, флаг - ({xPixel, yPixel})")
+                            # print(f"\tЭто левее центра пикселя, помечаю - ({xPixel, yPixel})")
                             self.img.put(uniqueColor, (xPixel, yPixel))
                     xCur += bx
                     yCur += by
