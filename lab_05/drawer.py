@@ -148,10 +148,10 @@ class Drawer(Canvas):
                     xCur += bx
                     yCur += by
                     # print("_____________________________")
-                if isDelayed:
-                    self.redraw()
-                    self.update()
-                    time.sleep(0.5)
+                # if isDelayed:
+                #     self.redraw()
+                #     self.update()
+                #     time.sleep(0.5)
 
         # Закрасить все, что надо закрасить
         # print(xMin, yMin, xMax, yMax)
